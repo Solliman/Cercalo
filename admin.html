@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <title>Area Amministratore - Cercalo</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="index.css?v=7.0">
+  <style>
+    /* Stili aggiuntivi specifici per l'interfaccia Admin */
+    body {
+      background-color: var(--bg-crema);
+      color: var(--color-testo);
+    }
+    
+    .admin-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--primary-pesca-chiaro);
+      padding-bottom: 20px;
+    }
+
+    .btn-ritorna {
+      background-color: transparent;
+      border: 2px solid var(--primary-pesca);
+      color: var(--primary-pesca);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-family: var(--font-corpo);
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition-veloce);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-ritorna:hover {
+      background-color: var(--primary-pesca);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .admin-card {
+      background-color: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: var(--shadow-nuvola);
+    }
+
+    .admin-card-title {
+      font-family: var(--font-titoli);
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--primary-pesca-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ECEAE6;
+      border-radius: 12px;
+      font-family: var(--font-corpo);
+      font-size: 15px;
+      background-color: #FAF9F6;
+      transition: var(--transition-veloce);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-pesca);
+      background-color: white;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .checkbox-group input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary-pesca);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--primary-pesca);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-family: var(--font-corpo);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-tasto);
+      transition: var(--transition-morbida);
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-pesca-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-tasto-hover);
+    }
+
+    .workers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-height: 550px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .worker-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid #ECEAE6;
+      border-radius: 16px;
+      background-color: #FAF9F6;
+      transition: var(--transition-veloce);
+    }
+
+    .worker-item:hover {
+      border-color: var(--primary-pesca-chiaro);
+      background-color: white;
+    }
+
+    .worker-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .worker-avatar {
+      font-size: 28px;
+      background-color: white;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .worker-name {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .worker-role {
+      font-size: 13px;
+      color: var(--color-testo-mutato);
+    }
+
+    .worker-meta {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .badge-admin {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-admin.pro {
+      background-color: var(--accent-salvia-chiaro);
+      color: var(--accent-salvia-dark);
+    }
+
+    .badge-admin.helper {
+      background-color: #FCEFF0;
+      color: #E56B6F;
+    }
+
+    .badge-admin.promo {
+      background-color: #FFF3CD;
+      color: #856404;
+      border: 1px solid #FFEBAA;
+    }
+
+    .btn-delete {
+      background-color: #FCEFF0;
+      color: #E56B6F;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-veloce);
+    }
+
+    .btn-delete:hover {
+      background-color: #E56B6F;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .btn-reset {
+      background-color: transparent;
+      border: 1px dashed var(--color-testo-mutato);
+      color: var(--color-testo-mutato);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition-veloce);
+      margin-top: 15px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-reset:hover {
+      background-color: #FCEFF0;
+      color: #E56B6F;
+      border-color: #E56B6F;
+    }
+
+    /* Protezione di Accesso */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-crema);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-box {
+      background-color: white;
+      border-radius: 28px;
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: var(--shadow-nuvola);
+      text-align: center;
+    }
+
+    .auth-title {
+      font-family: var(--font-titoli);
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--primary-pesca);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay di Accesso con Password -->
+  <div id="auth-panel" class="auth-overlay">
+    <div class="auth-box">
+      <div class="auth-title">Area Riservata</div>
+      <p style="color: var(--color-testo-mutato); font-size: 14px; margin-bottom: 24px;">Inserisci la password di amministrazione per gestire Cercalo.</p>
+      
+      <form id="form-auth-admin">
+        <div class="form-group" style="text-align: left;">
+          <label for="admin-pass">Password di Accesso</label>
+          <input type="password" id="admin-pass" class="form-control" placeholder="Inserisci password..." required>
+        </div>
+        <button type="submit" class="btn-submit">Accedi al Pannello</button>
+      </form>
+      <div id="auth-error" style="color: #E56B6F; font-size: 13px; font-weight: 600; margin-top: 15px; display: none;">Password non corretta! Riprova.</div>
+      <a href="index.html" class="btn-ritorna" style="margin-top: 20px; font-size: 13px; width: 100%; justify-content: center;">Ritorna al Sito</a>
+    </div>
+  </div>
+
+  <!-- Area di Gestione Amministratore (nascosta di default) -->
+  <div id="admin-panel" class="admin-container" style="display: none;">
+    <div class="admin-header">
+      <div>
+        <h1 style="font-family: var(--font-titoli); font-size: 32px; font-weight: 700; color: var(--color-testo);">Cercalo <span style="color: var(--primary-pesca)">Admin</span></h1>
+        <p style="color: var(--color-testo-mutato); margin-top: 4px;">Pannello di controllo per l'inserimento manuale e la gestione delle ditte e aiutanti locali.</p>
+      </div>
+      <a href="index.html" class="btn-ritorna">
+        ← Ritorna al Sito
+      </a>
+    </div>
+
+    <div class="admin-grid">
+      <!-- Sezione Form Inserimento -->
+      <div class="admin-card">
+        <h2 class="admin-card-title">📝 Inserisci Nuovo Profilo</h2>
+        
+        <form id="form-add-worker">
+          <div class="form-group">
+            <label for="w-nome">Nome e Cognome / Ragione Sociale *</label>
+            <input type="text" id="w-nome" class="form-control" placeholder="Es. Giuseppe Rossi o Rossi Termoidraulica" required>
+          </div>
+
+          <div class="form-group">
+            <label for="w-ruolo">Ruolo descrittivo *</label>
+            <input type="text" id="w-ruolo" class="form-control" placeholder="Es. Idraulico di fiducia o Estetista a domicilio" required>
+          </div>
+
+          <div class="form-group">
+            <label for="w-avatar">Emoji di copertina *</label>
+            <select id="w-avatar" class="form-control" required>
+              <option value="👨‍🔧">👨‍🔧 Artigiano / Tuttofare</option>
+              <option value="🔧">🔧 Idraulico / Tecnico</option>
+              <option value="⚡">⚡ Elettricista</option>
+              <option value="💇‍♀️">💇‍♀️ Parrucchiera / Parrucchiere</option>
+              <option value="💅">💅 Estetista</option>
+              <option value="👩‍⚕️">👩‍⚕️ Assistenza e cura</option>
+              <option value="👨‍🌾">👨‍🌾 Giardiniere / Esterni</option>
+              <option value="🧹">🧹 Impresa Pulizie</option>
+              <option value="🚚">🚚 Traslochi / Trasporti</option>
+              <option value="🎨">🎨 Decoratore / Imbianchino</option>
+              <option value="🪵">🪵 Falegname</option>
+              <option value="❤️">❤️ Altro Aiuto Generico</option>
+            </select>
+          </div>
+
+          <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
+            <div class="form-group">
+              <label for="w-citta">Città *</label>
+              <input type="text" id="w-citta" class="form-control" placeholder="Es. Milano o Roma" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="w-categoria">Categoria Filtro *</label>
+              <select id="w-categoria" class="form-control" required>
+                <option value="tuttofare">Tuttofare</option>
+                <option value="idraulico">Idraulico</option>
+                <option value="elettricista">Elettricista</option>
+                <option value="estetista">Estetista</option>
+                <option value="parrucchiere">Parrucchiere</option>
+                <option value="assistenza">Assistenza</option>
+                <option value="giardiniere">Giardiniere</option>
+                <option value="baratto">Baratto / Scambio</option>
+                <option value="altro">Altro...</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="w-categoria-custom-container" class="form-group" style="display: none;">
+            <label for="w-categoria-custom">Specifica Categoria Personalizzata *</label>
+            <input type="text" id="w-categoria-custom" class="form-control" placeholder="Es. Falegname, Orologiaio, Vetraio...">
+          </div>
+
+          <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
+            <div class="form-group">
+              <label for="w-tipo">Tipo Operatore *</label>
+              <select id="w-tipo" class="form-control" required>
+                <option value="aiutante">Aiutante (Offerta libera)</option>
+                <option value="professionista">Professionista (Partita IVA)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="w-prezzo">Prezzo / Tariffa indicativa *</label>
+              <input type="text" id="w-prezzo" class="form-control" placeholder="Es. Un pensiero per l'aiuto o da €25/h" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="w-biografia">Biografia / Presentazione dell'attività *</label>
+            <textarea id="w-biografia" class="form-control" rows="4" placeholder="Descrivi il modo in cui questa persona lavora 'con il cuore', le sue specializzazioni e la sua dedizione..." required></textarea>
+          </div>
+
+          <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
+            <div class="form-group">
+              <label for="w-tel">Numero di Telefono *</label>
+              <input type="text" id="w-tel" class="form-control" placeholder="Es. +39 347 123456" required>
+            </div>
+
+            <div class="form-group">
+              <label for="w-email">Indirizzo Email</label>
+              <input type="email" id="w-email" class="form-control" placeholder="Es. info@esempio.it">
+            </div>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="w-promo" checked>
+            <label for="w-promo">🎁 <strong>Regala 1 Anno Gratis</strong> (Promo di lancio)</label>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" id="btn-submit-form" class="btn-submit">Aggrega Lavoratore al Database</button>
+            <button type="button" id="btn-cancel-edit" class="btn-submit" style="background-color: var(--color-testo-mutato); display: none; width: auto; padding: 14px 20px;">Annulla</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sezione Lista Artigiani Correnti -->
+      <div class="admin-card">
+        <h2 class="admin-card-title" style="margin-top: 0; color: #E56B6F;">⏳ Profili da Approvare</h2>
+        <div id="pending-list-container" class="workers-list" style="margin-bottom: 25px; max-height: 250px; border-bottom: 1px solid var(--primary-pesca-chiaro); padding-bottom: 15px;">
+          <!-- Popolato Dinamicamente -->
+        </div>
+
+        <h2 class="admin-card-title">🗂️ Profili Attivi in Elenco</h2>
+        <div id="workers-list-container" class="workers-list" style="max-height: 350px;">
+          <!-- Popolato Dinamicamente -->
+        </div>
+
+        <button id="btn-reset-db" class="btn-reset">⚠️ Ripristina profili demo iniziali</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Database locale
+    let ARTIGIANI = [];
+    let editingId = null;
+    const PASSCODE = "cercalo2026"; // Semplice password per il lancio
+
+    // Carica database
+    const caricaDatabase = () => {
+      const dbLocale = localStorage.getItem("cercalo_database");
+      if (dbLocale) {
+        ARTIGIANI = JSON.parse(dbLocale);
+      } else {
+        ARTIGIANI = [];
+      }
+      renderWorkersList();
+    };
+
+    // Salva database
+    const salvaDatabase = () => {
+      localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
+      renderWorkersList();
+    };
+
+    // Render liste in admin (pendenti e attivi)
+    const renderWorkersList = () => {
+      const activeContainer = document.getElementById("workers-list-container");
+      const pendingContainer = document.getElementById("pending-list-container");
+      if (!activeContainer || !pendingContainer) return;
+
+      const attivi = ARTIGIANI.filter(a => a.approvato !== false);
+      const pendenti = ARTIGIANI.filter(a => a.approvato === false);
+
+      // Render profili da approvare (Pendenti)
+      if (pendenti.length === 0) {
+        pendingContainer.innerHTML = `<p style="color: var(--color-testo-mutato); text-align: center; padding: 20px 0; font-size: 13px;">Nessun profilo in attesa di approvazione.</p>`;
+      } else {
+        pendingContainer.innerHTML = pendenti.map(art => {
+          const badgeTipo = art.tipoHelper === "professionista" 
+            ? `<span class="badge-admin pro">💼 Professionista</span>` 
+            : `<span class="badge-admin helper">❤️ Aiutante</span>`;
+          const badgePromo = art.promoGratis 
+            ? `<span class="badge-admin promo">🎁 1 Anno Gratis</span>` 
+            : '';
+
+          return `
+            <div class="worker-item" style="border-left: 4px solid #E56B6F;">
+              <div class="worker-info">
+                <div class="worker-avatar">${art.avatar || '👨‍🔧'}</div>
+                <div>
+                  <div class="worker-name">${art.nome}</div>
+                  <div class="worker-role">${art.ruolo} - ${art.citta}</div>
+                  <div class="worker-meta">
+                    ${badgeTipo}
+                    ${badgePromo}
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-ritorna" style="font-size: 11px; padding: 4px 10px; border-color: var(--accent-salvia); color: var(--accent-salvia-dark); background-color: transparent;" onclick="approvaArtigiano(${art.id})">Approva</button>
+                <button class="btn-delete" onclick="eliminaArtigiano(${art.id})" title="Rifiuta Profilo">✕</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Render profili attivi
+      if (attivi.length === 0) {
+        activeContainer.innerHTML = `<p style="color: var(--color-testo-mutato); text-align: center; padding: 40px 0;">Nessun profilo attivo presente.</p>`;
+      } else {
+        activeContainer.innerHTML = attivi.map(art => {
+          const badgeTipo = art.tipoHelper === "professionista" 
+            ? `<span class="badge-admin pro">💼 Professionista</span>` 
+            : `<span class="badge-admin helper">❤️ Aiutante</span>`;
+          const badgePromo = art.promoGratis 
+            ? `<span class="badge-admin promo">🎁 1 Anno Gratis</span>` 
+            : '';
+
+          return `
+            <div class="worker-item">
+              <div class="worker-info">
+                <div class="worker-avatar">${art.avatar || '👨‍🔧'}</div>
+                <div>
+                  <div class="worker-name">${art.nome}</div>
+                  <div class="worker-role">${art.ruolo} - ${art.citta}</div>
+                  <div class="worker-meta">
+                    ${badgeTipo}
+                    ${badgePromo}
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn-ritorna" style="font-size: 11px; padding: 4px 10px; border-color: var(--primary-pesca); color: var(--primary-pesca); background-color: transparent;" onclick="modificaArtigiano(${art.id})">Modifica</button>
+                <button class="btn-delete" onclick="eliminaArtigiano(${art.id})" title="Elimina Profilo">✕</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    };
+
+    // Approva
+    window.approvaArtigiano = (id) => {
+      const artigiano = ARTIGIANI.find(a => a.id === id);
+      if (artigiano) {
+        artigiano.approvato = true;
+        salvaDatabase();
+        alert(`Il profilo di ${artigiano.nome} è stato approvato ed è ora attivo in elenco!`);
+      }
+    };
+
+    // Modifica
+    window.modificaArtigiano = (id) => {
+      const art = ARTIGIANI.find(a => a.id === id);
+      if (!art) return;
+
+      editingId = id;
+      
+      // Carica i dati nel form
+      document.getElementById("w-nome").value = art.nome;
+      document.getElementById("w-ruolo").value = art.ruolo;
+      document.getElementById("w-avatar").value = art.avatar;
+      document.getElementById("w-citta").value = art.citta;
+      
+      // Controlla categoria
+      const selectCat = document.getElementById("w-categoria");
+      const predefinite = ["tuttofare", "idraulico", "elettricista", "estetista", "parrucchiere", "assistenza", "giardiniere", "baratto"];
+      
+      if (predefinite.includes(art.categoria)) {
+        selectCat.value = art.categoria;
+        document.getElementById("w-categoria-custom-container").style.display = "none";
+        document.getElementById("w-categoria-custom").required = false;
+        document.getElementById("w-categoria-custom").value = "";
+      } else {
+        selectCat.value = "altro";
+        document.getElementById("w-categoria-custom-container").style.display = "block";
+        document.getElementById("w-categoria-custom").required = true;
+        document.getElementById("w-categoria-custom").value = art.categoria;
+      }
+      
+      document.getElementById("w-tipo").value = art.tipoHelper;
+      document.getElementById("w-prezzo").value = art.prezzo;
+      document.getElementById("w-biografia").value = art.biografia;
+      document.getElementById("w-tel").value = art.contatti.telefono;
+      document.getElementById("w-email").value = art.contatti.email || "";
+      document.getElementById("w-promo").checked = !!art.promoGratis;
+      
+      // Aggiorna pulsanti
+      document.getElementById("btn-submit-form").innerText = "Salva Modifiche Profilo";
+      document.getElementById("btn-cancel-edit").style.display = "block";
+      
+      // Scroll al form
+      document.getElementById("form-add-worker").scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Annulla Modifica
+    document.getElementById("btn-cancel-edit").addEventListener("click", () => {
+      editingId = null;
+      document.getElementById("form-add-worker").reset();
+      document.getElementById("w-categoria-custom-container").style.display = "none";
+      document.getElementById("btn-submit-form").innerText = "Aggrega Lavoratore al Database";
+      document.getElementById("btn-cancel-edit").style.display = "none";
+    });
+
+    // Elimina
+    window.eliminaArtigiano = (id) => {
+      if (confirm("Sei sicuro di voler eliminare definitivamente questo profilo?")) {
+        ARTIGIANI = ARTIGIANI.filter(a => a.id !== id);
+        salvaDatabase();
+      }
+    };
+
+    // Gestione Accesso
+    document.getElementById("form-auth-admin").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pass = document.getElementById("admin-pass").value;
+      if (pass === PASSCODE) {
+        document.getElementById("auth-panel").style.display = "none";
+        document.getElementById("admin-panel").style.display = "block";
+        caricaDatabase();
+      } else {
+        document.getElementById("auth-error").style.display = "block";
+      }
+    });
+
+    // Gestione mostra/nascondi categoria personalizzata
+    document.getElementById("w-categoria").addEventListener("change", (e) => {
+      const container = document.getElementById("w-categoria-custom-container");
+      const input = document.getElementById("w-categoria-custom");
+      if (e.target.value === "altro") {
+        container.style.display = "block";
+        input.required = true;
+      } else {
+        container.style.display = "none";
+        input.required = false;
+        input.value = "";
+      }
+    });
+
+    // Inserimento / Modifica
+    document.getElementById("form-add-worker").addEventListener("submit", (e) => {
+      e.preventDefault();
+      
+      const nomeInput = document.getElementById("w-nome").value.trim();
+      
+      // Controllo format Nome e Cognome (deve contenere almeno uno spazio per garantire Nome + Cognome)
+      // tranne se contiene SRL, S.r.l., SRLS, S.n.c., SAS, o Ditta per le ragioni sociali
+      const isRagioneSociale = /srl|s\.r\.l\.|srls|snc|s\.n\.c\.|sas|ditta|impresa/i.test(nomeInput);
+      if (!isRagioneSociale && !nomeInput.includes(" ")) {
+        if (!confirm("Hai inserito solo una parola nel nominativo. Si consiglia di inserire Nome e Cognome completi (es. Giuseppe Rossi) per dare maggior fiducia agli utenti. Vuoi procedere comunque?")) {
+          return;
+        }
+      }
+
+      let catValue = document.getElementById("w-categoria").value;
+      if (catValue === "altro") {
+        catValue = document.getElementById("w-categoria-custom").value.toLowerCase().trim();
+      }
+      
+      if (editingId !== null) {
+        // MODIFICA
+        const art = ARTIGIANI.find(a => a.id === editingId);
+        if (art) {
+          art.nome = nomeInput;
+          art.ruolo = document.getElementById("w-ruolo").value;
+          art.avatar = document.getElementById("w-avatar").value;
+          art.citta = document.getElementById("w-citta").value;
+          art.categoria = catValue;
+          art.tipoHelper = document.getElementById("w-tipo").value;
+          art.prezzo = document.getElementById("w-prezzo").value;
+          art.biografia = document.getElementById("w-biografia").value;
+          art.promoGratis = document.getElementById("w-promo").checked;
+          art.contatti = {
+            telefono: document.getElementById("w-tel").value,
+            email: document.getElementById("w-email").value || ""
+          };
+          
+          salvaDatabase();
+          alert("Profilo aggiornato con successo!");
+          
+          // Resetta stato di editing
+          editingId = null;
+          document.getElementById("btn-submit-form").innerText = "Aggrega Lavoratore al Database";
+          document.getElementById("btn-cancel-edit").style.display = "none";
+        }
+      } else {
+        // INSERIMENTO NUOVO
+        const nuovoId = ARTIGIANI.length > 0 ? Math.max(...ARTIGIANI.map(a => a.id)) + 1 : 1;
+        const nuovo = {
+          id: nuevoId,
+          nome: nomeInput,
+          ruolo: document.getElementById("w-ruolo").value,
+          avatar: document.getElementById("w-avatar").value,
+          citta: document.getElementById("w-citta").value,
+          categoria: catValue,
+          tipoHelper: document.getElementById("w-tipo").value,
+          prezzo: document.getElementById("w-prezzo").value,
+          biografia: document.getElementById("w-biografia").value,
+          cuori: 5.0,
+          recensioniCount: 0,
+          approvato: true, // Profilo inserito dall'amministratore è approvato di default
+          promoGratis: document.getElementById("w-promo").checked,
+          contatti: {
+            telefono: document.getElementById("w-tel").value,
+            email: document.getElementById("w-email").value || ""
+          },
+          recensioni: []
+        };
+
+        ARTIGIANI.push(nuovo);
+        salvaDatabase();
+        alert("Profilo inserito con successo nel database ed attivo in elenco!");
+      }
+      
+      // Reset form
+      document.getElementById("form-add-worker").reset();
+      document.getElementById("w-categoria-custom-container").style.display = "none";
+    });
+
+    // Reset Database a Mock Iniziali
+    document.getElementById("btn-reset-db").addEventListener("click", () => {
+      if (confirm("Attenzione: questa azione cancellerà tutti i profili inseriti manualmente e ripristinerà i profili demo originali. Vuoi procedere?")) {
+        localStorage.removeItem("cercalo_database");
+        location.reload();
+      }
+    });
+  </script>
+</body>
+</html>

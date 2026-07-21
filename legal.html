@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <title>Termini & Privacy - Cercalo</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="index.css?v=7.0">
+  <style>
+    body {
+      background-color: var(--bg-crema);
+      color: var(--color-testo);
+    }
+    .sezione-legal {
+      max-width: 900px;
+      margin: 60px auto 80px auto;
+      padding: 0 20px;
+    }
+    .app-header {
+      border-bottom: 1px solid rgba(200, 106, 81, 0.08);
+      background-color: transparent;
+    }
+    .tabs-legal {
+      display: flex;
+      gap: 12px;
+      border-bottom: 2px solid var(--primary-pesca-chiaro);
+      margin-bottom: 30px;
+      padding-bottom: 2px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-corpo);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 24px;
+      cursor: pointer;
+      color: var(--color-testo-mutato);
+      border-radius: 12px 12px 0 0;
+      transition: var(--transition-veloce);
+      white-space: nowrap;
+      position: relative;
+    }
+    .tab-btn:hover {
+      color: var(--primary-pesca);
+      background-color: rgba(200, 106, 81, 0.03);
+    }
+    .tab-btn.attivo {
+      color: var(--primary-pesca-dark);
+    }
+    .tab-btn.attivo::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background-color: var(--primary-pesca-dark);
+      border-radius: 2px;
+    }
+    .contenuto-legal-card {
+      background-color: white;
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: var(--shadow-nuvola);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+    @media (max-width: 768px) {
+      .contenuto-legal-card {
+        padding: 24px;
+      }
+    }
+    .legal-sezione-txt {
+      display: none;
+    }
+    .legal-sezione-txt.attivo {
+      display: block;
+    }
+    .legal-sezione-txt h2 {
+      font-family: var(--font-titoli);
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: var(--primary-pesca-dark);
+      border-bottom: 1px solid #ECEAE6;
+      padding-bottom: 10px;
+    }
+    .legal-sezione-txt h3 {
+      font-family: var(--font-titoli);
+      font-size: 18px;
+      margin: 25px 0 10px 0;
+      color: var(--color-testo);
+    }
+    .legal-sezione-txt ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+    .legal-sezione-txt li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="Loghi/logo_terracotta_scontornato.png" alt="Cercalo Logo">
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="btn-nav-info" style="text-decoration: none;">← Torna alla Home Page</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sezione-legal">
+    <div class="tabs-legal">
+      <button class="tab-btn attivo" onclick="mostraTab('tos')">Termini di Servizio</button>
+      <button class="tab-btn" onclick="mostraTab('privacy')">Privacy Policy</button>
+      <button class="tab-btn" onclick="mostraTab('cookie')">Cookie Policy</button>
+    </div>
+
+    <div class="contenuto-legal-card">
+      
+      <!-- Termini di Servizio -->
+      <div id="legal-tos" class="legal-sezione-txt attivo">
+        <h2>Termini e Condizioni di Servizio</h2>
+        <p>Benvenuto su <strong>Cercalo</strong> (di seguito, il "Sito"). Ti invitiamo a leggere attentamente questi Termini di Servizio prima di utilizzare la nostra piattaforma.</p>
+        
+        <h3>1. Descrizione del Servizio</h3>
+        <p>Cercalo è un elenco informativo e una bacheca di contatto virtuale per connettere persone che hanno bisogno di un aiuto pratico domestico ("Cercatori") con soggetti che offrono piccoli servizi o competenze ("Lavoratori" o "Aiutanti"). Cercalo fornisce esclusivamente la tecnologia di aggregazione e visibilità dei contatti e non partecipa in alcun modo ai successivi accordi commerciali, lavorativi o contrattuali tra gli utenti.</p>
+        
+        <h3>2. Limitazione di Responsabilità (Fondamentale)</h3>
+        <p><strong>Cercalo non risponde dell'operato dei soggetti inseriti nella bacheca.</strong> Il Sito non esegue verifiche preventive approfondite sul casellario giudiziale, sulle competenze tecniche dichiarate o sulla regolarità amministrativo-fiscale dei Lavoratori o degli Aiutanti.</p>
+        <p>Qualsiasi accordo, prestazione lavorativa, compenso o pagamento avviene esclusivamente tra le parti interessate (Cercatore e Lavoratore) al di fuori di Cercalo. Il Sito, la sua gestione e i suoi fondatori declinano ogni responsabilità per danni materiali, fisici, morali, ritardi, inadempienze, controversie fiscali o legali che dovessero sorgere a seguito dei contatti avvenuti tramite la piattaforma.</p>
+        
+        <h3>3. Quota di Iscrizione, Promozioni e Diritto di Recesso</h3>
+        <p>L'iscrizione alla piattaforma per i Lavoratori (Professionisti e Aiutanti) prevede in condizioni ordinarie una quota simbolica annuale di <strong>5,00 €</strong> per sostenere le spese di gestione.</p>
+        <p><strong>Promozione di Lancio:</strong> Per tutti gli utenti che si registrano in questa fase di lancio e fino al <strong>30 settembre 2026</strong>, l'iscrizione è del tutto gratuita per il primo anno. Nessun importo sarà dovuto o addebitato durante questo periodo di prova gratuita.</p>
+        <p><strong>Diritto di Recesso (Codice del Consumo):</strong> Ove applicabile e a seguito di pagamenti effettuati, ai sensi del Codice del Consumo italiano, l'utente ha il diritto di recedere dall'iscrizione entro 14 giorni solari dall'avvenuto pagamento per ottenere il rimborso integrale, inviando una richiesta a <span style="font-weight: 600;">recessi@cercalo.it</span>.</p>
+        
+        <h3>4. Obbligo di Comportamento Etico</h3>
+        <p>Cercalo promuove il lavoro svolto "con il cuore", che si basa su trasparenza, cortesia, pulizia e prezzi giusti. Il Sito si riserva il diritto insindacabile di rimuovere dall'elenco, senza alcun rimborso, i profili dei lavoratori che riceveranno segnalazioni gravi o ripetute da parte degli utenti per comportamento scorretto, tariffe opache o violazioni della fiducia.</p>
+      </div>
+
+      <!-- Privacy Policy -->
+      <div id="legal-privacy" class="legal-sezione-txt">
+        <h2>Informativa sulla Privacy (GDPR)</h2>
+        <p>La presente Informativa ha lo scopo di illustrare come Cercalo raccoglie, conserva e tratta i tuoi dati personali, in conformità con il Regolamento Europeo sulla Protezione dei Dati (GDPR - Regolamento UE 2016/679).</p>
+        
+        <h3>1. Titolare del Trattamento</h3>
+        <p>Il Titolare del trattamento dei dati raccolti tramite il Sito è <strong>Cercalo Italia</strong>, contattabile all'indirizzo email <span style="font-weight: 600;">privacy@cercalo.it</span>.</p>
+        
+        <h3>2. Tipi di Dati Raccolti</h3>
+        <p>Raccogliamo solo i dati strettamente necessari per il funzionamento del servizio:</p>
+        <ul>
+          <li><strong>Per chi cerca aiuto (Cercatori):</strong> Dati inseriti durante la registrazione base per sbloccare i numeri di telefono (Nome, Cognome, Email).</li>
+          <li><strong>Per chi offre aiuto (Lavoratori/Aiutanti):</strong> Nome, Cognome, Ruolo, Città, Descrizione dell'attività, Numero di Telefono ed Email (se fornita), Categoria, e Foto/Avatar selezionato.</li>
+        </ul>
+
+        <h3>3. Finalità del Trattamento</h3>
+        <p>I dati personali sono raccolti per:</p>
+        <ul>
+          <li>Consentire la pubblicazione del profilo del lavoratore nel motore di ricerca geografico del sito.</li>
+          <li>Consentire ai cercatori di visualizzare i dati di contatto telefonico/email per richiedere l'aiuto.</li>
+          <li>Gestire la quota di abbonamento annuale e l'invio delle relative comunicazioni di servizio.</li>
+        </ul>
+
+        <h3>4. Conservazione dei Dati</h3>
+        <p>I tuoi dati sono conservati su server sicuri e sono protetti da misure tecniche idonee. Saranno conservati fino alla richiesta di cancellazione del tuo account da parte tua o fino a revoca del consenso.</p>
+
+        <h3>5. Diritti dell'Interessato</h3>
+        <p>Hai il diritto in qualsiasi momento di richiedere l'accesso, la rettifica, la portabilità o la cancellazione totale dei tuoi dati personali dai nostri database scrivendoci semplicemente all'indirizzo <span style="font-weight: 600;">cancella@cercalo.it</span>.</p>
+      </div>
+
+      <!-- Cookie Policy -->
+      <div id="legal-cookie" class="legal-sezione-txt">
+        <h2>Cookie Policy</h2>
+        <p>Questo sito utilizza i cookie per migliorare l'esperienza utente e assicurare il corretto funzionamento delle funzioni tecniche essenziali.</p>
+        
+        <h3>Cosa sono i Cookie?</h3>
+        <p>I cookie sono piccoli file di testo che i siti visitati inviano al terminale dell'utente, dove vengono memorizzati per poi essere ritrasmessi al sito alla visita successiva.</p>
+
+        <h3>Cookie Tecnici (Essenziali)</h3>
+        <p>Cercalo utilizza esclusivamente **cookie tecnici ed essenziali** per scopi di navigazione. Questi includono:</p>
+        <ul>
+          <li>Memorizzazione della sessione di accesso degli utenti.</li>
+          <li>Salvataggio delle preferenze temporanee di ricerca (es. filtro città).</li>
+          <li>Salvataggio dello stato di approvazione dei cookie stessi.</li>
+        </ul>
+        <p>Questi cookie non tracciano in alcun modo le abitudini di navigazione dell'utente all'esterno del nostro sito e non richiedono un consenso preventivo obbligatorio per legge, in quanto necessari alla fornitura del servizio.</p>
+
+        <h3>Cookie di Terze Parti e Profilazione</h3>
+        <p>In linea con la nostra filosofia di pulizia, **Cercalo non utilizza cookie di profilazione commerciale, né script pubblicitari traccianti di terze parti (come Google AdSense, Facebook Pixel, ecc.)**.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background-color: white; border-top: 1px solid rgba(200, 106, 81, 0.08); padding: 40px 0; text-align: center; font-size: 14px; color: var(--color-testo-mutato);">
+    <div class="container">
+      <p style="font-family: var(--font-titoli); font-weight: 700; color: var(--color-testo); font-size: 16px; margin-bottom: 12px;">Cercalo</p>
+      <p style="max-width: 450px; margin: 0 auto 20px auto; line-height: 1.6;">Troviamo chi ti aiuta con il cuore. La bacheca fraterna degli artigiani e dei tuttofare della tua zona.</p>
+      <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+        <a href="chi-siamo.html" style="color: var(--color-testo-mutato); text-decoration: none;">La Nostra Filosofia</a>
+        <a href="legal.html" style="color: var(--color-testo); font-weight: 600; text-decoration: none;">Termini di Servizio & Privacy</a>
+      </div>
+      <p style="font-size: 11px; opacity: 0.8;">&copy; 2026 Cercalo. Tutti i diritti riservati.</p>
+    </div>
+  </footer>
+
+  <script>
+    function mostraTab(tabId) {
+      // Rimuovi classe attivo da tutti i bottoni
+      const bottoni = document.querySelectorAll('.tab-btn');
+      bottoni.forEach(btn => btn.classList.remove('attivo'));
+      
+      // Rimuovi classe attivo da tutti i testi
+      const testi = document.querySelectorAll('.legal-sezione-txt');
+      testi.forEach(t => t.classList.remove('attivo'));
+      
+      // Attiva bottone cliccato
+      event.target.classList.add('attivo');
+      
+      // Attiva blocco di testo corrispondente
+      document.getElementById('legal-' + tabId).classList.add('attivo');
+    }
+  </script>
+
+</body>
+</html>

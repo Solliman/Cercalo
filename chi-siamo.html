@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <title>Chi Siamo - Cercalo</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="index.css?v=7.0">
+  <style>
+    body {
+      background-color: var(--bg-crema);
+      color: var(--color-testo);
+    }
+    .hero-chisiamo {
+      padding: 80px 0 50px 0;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(200, 106, 81, 0.05) 0%, rgba(247, 243, 231, 0) 100%);
+    }
+    .hero-chisiamo h1 {
+      font-family: var(--font-titoli);
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero-chisiamo p {
+      font-size: 18px;
+      color: var(--color-testo-mutato);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .sezione-contenuto {
+      max-width: 800px;
+      margin: 0 auto 80px auto;
+      padding: 0 20px;
+    }
+    .paragrafo-chiave {
+      font-size: 20px;
+      line-height: 1.6;
+      font-weight: 500;
+      margin-bottom: 30px;
+      color: var(--color-testo);
+      font-family: var(--font-titoli);
+      text-align: center;
+      position: relative;
+    }
+    .paragrafo-chiave::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 3px;
+      background-color: var(--primary-pesca);
+      margin: 20px auto 0 auto;
+      border-radius: 2px;
+    }
+    .articolo-chi {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--color-testo);
+    }
+    .articolo-chi p {
+      margin-bottom: 20px;
+    }
+    .griglia-valori {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 40px 0;
+    }
+    @media (max-width: 768px) {
+      .griglia-valori {
+        grid-template-columns: 1fr;
+      }
+    }
+    .valore-card {
+      background-color: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: var(--shadow-nuvola);
+      transition: var(--transition-morbida);
+    }
+    .valore-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-nuvola-hover);
+    }
+    .valore-icona {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .valore-titolo {
+      font-family: var(--font-titoli);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .valore-descrizione {
+      font-size: 14px;
+      color: var(--color-testo-mutato);
+      line-height: 1.6;
+    }
+    .sezione-appello {
+      background-color: white;
+      border-radius: 32px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: var(--shadow-nuvola);
+      margin-top: 50px;
+      border: 1px solid var(--primary-pesca-chiaro);
+    }
+    .app-header {
+      border-bottom: 1px solid rgba(200, 106, 81, 0.08);
+      background-color: transparent;
+    }
+    .btn-registrati-chisiamo {
+      background-color: var(--primary-pesca);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 24px;
+      font-family: var(--font-corpo);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-tasto);
+      transition: var(--transition-morbida);
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    .btn-registrati-chisiamo:hover {
+      background-color: var(--primary-pesca-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-tasto-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="Loghi/logo_terracotta_scontornato.png" alt="Cercalo Logo">
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="btn-nav-info" style="text-decoration: none;">← Torna alla Home Page</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-chisiamo">
+    <div class="container">
+      <h1>La Nostra Filosofia</h1>
+      <p>Trovare risposte vicine alle difficoltà quotidiane, costruendo relazioni umane basate sul cuore, la trasparenza e l'aiuto reciproco.</p>
+    </div>
+  </section>
+
+  <!-- Contenuto Principale -->
+  <main class="sezione-contenuto">
+    <div class="paragrafo-chiave">
+      "Perché in un mondo sempre più veloce e impersonale, crediamo che la fiducia, l'onestà e un sorriso valgano più di qualsiasi algoritmo di mercato."
+    </div>
+
+    <div class="articolo-chi">
+      <p>
+        <strong>Cercalo</strong> nasce da un'ispirazione profonda e semplice: connettere chi ha bisogno di un piccolo o grande aiuto domestico con persone che offrono il proprio tempo e la propria professionalità mettendo il <strong>cuore</strong> in ciò che fanno.
+      </p>
+      <p>
+        La parola *Cercalo* racchiude in sé una duplice anima: se da un lato indica la ricerca pratica di un artigiano o di un aiuto di quartiere nelle difficoltà di tutti i giorni, dall'altro evoca una ricerca spirituale e personale del bene, del prossimo e della luce anche nei momenti di fatica quotidiana.
+      </p>
+      <p>
+        Abbiamo scelto la **Terracotta** come materiale simbolo della nostra comunità per l'Italia. La terracotta è una materia povera, antica e naturale, che nasce dalla terra e si modella con le mani e con il fuoco. Rappresenta la solidità del lavoro artigianale, la vicinanza alle origini e l'accoglienza calorosa di una casa.
+      </p>
+    </div>
+
+    <!-- Griglia dei Valori -->
+    <div class="griglia-valori">
+      <div class="valore-card">
+        <div class="valore-icona">❤️</div>
+        <h3 class="valore-titolo">Fatto con il Cuore & Rispetto</h3>
+        <p class="valore-descrizione">
+          Su Cercalo vogliamo persone disposte a dedicarsi al lavoro con cura ed empatia. Chiediamo però rispetto reciproco: il lavoratore si impegna con dedizione, e l'utente deve valutare il suo operato in modo equo e leale sul lavoro finito, evitando giudizi di antipatia personale.
+        </p>
+      </div>
+
+      <div class="valore-card">
+        <div class="valore-icona">🤝</div>
+        <h3 class="valore-titolo">Due Modi di Aiutare</h3>
+        <p class="valore-descrizione">
+          Accogliamo sia gli <strong>Aiutanti di Quartiere</strong> (hobbisti disposti ad aiutare per passione o vicinato in cambio di una semplice offerta libera) sia i <strong>Professionisti</strong> (ditte e lavoratori con P. IVA che offrono tariffe oneste e trasparenti).
+        </p>
+      </div>
+
+      <div class="valore-card">
+        <div class="valore-icona">💎</div>
+        <h3 class="valore-titolo">No Pubblicità Invasiva</h3>
+        <p class="valore-descrizione">
+          Rifiutiamo i banner pubblicitari traccianti che riempiono lo schermo. Il nostro portale è pulito, sereno ed è sostenuto solo dalla community per rimanere indipendente ed etico.
+        </p>
+      </div>
+
+      <div class="valore-card">
+        <div class="valore-icona">🌱</div>
+        <h3 class="valore-titolo">Lancio Gratuito (Fino a Settembre)</h3>
+        <p class="valore-descrizione">
+          L'iscrizione è del tutto gratuita fino a fine settembre 2026 per chi si registra in questa fase di lancio. Successivamente, sarà richiesta una quota minima di 5€/anno per coprire i costi di manutenzione e tenere la community al sicuro da profili fasulli.
+        </p>
+      </div>
+    </div>
+
+    <!-- Circuito del Baratto Solidale -->
+    <div class="baratto-info-box" style="margin-top: 30px; background-color: white; border-radius: 24px; padding: 30px; border: 1px solid rgba(200, 106, 81, 0.12); box-shadow: var(--shadow-nuvola); text-align: left;">
+      <h4 style="color: var(--primary-pesca); font-family: var(--font-titoli); font-size: 18px; margin-top: 0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🔄 Circuito del Baratto Solidale (In Arrivo!)</h4>
+      <p style="font-size: 14px; line-height: 1.6; color: var(--color-testo-mutato); margin: 0;">
+        Presto sarà attiva anche la possibilità di effettuare un baratto tra professionisti o hobbisti del circuito per scambiare beni e servizi (es. saponette biologiche con conserve d'olio). La community sosterrà le spese di spedizione dei pacchi scambiati tramite corrieri nazionali convenzionati in via di accordo, grazie al reinvestimento etico delle quote di iscrizione.
+      </p>
+    </div>
+
+    <!-- Appello all'Azione -->
+    <div class="sezione-appello">
+      <h3 style="font-family: var(--font-titoli); font-size: 24px; font-weight: 700; margin-bottom: 10px;">Vuoi fare parte di questa storia?</h3>
+      <p style="color: var(--color-testo-mutato); font-size: 15px; max-width: 500px; margin: 0 auto 15px auto;">Se offri piccoli aiuti o se hai un'attività professionale e lavori con il cuore, iscriviti oggi e unisciti alla nostra rete.</p>
+      <a href="index.html" class="btn-registrati-chisiamo">Torna alla Home ed Iscriviti</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background-color: white; border-top: 1px solid rgba(200, 106, 81, 0.08); padding: 40px 0; text-align: center; font-size: 14px; color: var(--color-testo-mutato);">
+    <div class="container">
+      <p style="font-family: var(--font-titoli); font-weight: 700; color: var(--color-testo); font-size: 16px; margin-bottom: 12px;">Cercalo</p>
+      <p style="max-width: 450px; margin: 0 auto 20px auto; line-height: 1.6;">Troviamo chi ti aiuta con il cuore. La bacheca fraterna degli artigiani e dei tuttofare della tua zona.</p>
+      <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+        <a href="chi-siamo.html" style="color: var(--color-testo); font-weight: 600; text-decoration: none;">La Nostra Filosofia</a>
+        <a href="legal.html" style="color: var(--color-testo-mutato); text-decoration: none;">Termini di Servizio & Privacy</a>
+      </div>
+      <p style="font-size: 11px; opacity: 0.8;">&copy; 2026 Cercalo. Tutti i diritti riservati.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
