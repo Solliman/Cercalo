@@ -241,6 +241,12 @@ const caricaStato = () => {
 // Aggiorna l'interfaccia se l'utente è registrato
 const aggiornaUIRegistrazione = () => {
   const btnAccedi = document.getElementById("btn-header-accedi");
+  const btnLavoratore = document.getElementById("btn-header-registrati-lavoratore");
+
+  if (btnLavoratore) {
+    btnLavoratore.style.display = "none";
+  }
+
   if (btnAccedi) {
     btnAccedi.innerHTML = "✨ Sei Online";
     btnAccedi.style.backgroundColor = "var(--primary-pesca-chiaro)";
@@ -460,52 +466,77 @@ window.gestisciContatto = (id) => {
     // Utente registrato: mostra direttamente il modal dettagli
     apriModalDettagli(artigiano);
   } else {
-    // Utente non registrato: apri il modal di registrazione/spiegazione
-    apriModalRegistrazione();
+    // Utente non registrato: apri il modale di registrazione cercatore
+    apriModalRegistrazioneCercatore();
   }
 };
 
-// Apertura Modal Registrazione
-const apriModalRegistrazione = () => {
+// Mostra la sotto-sezione corretta dell'autenticazione nel modale unico
+window.mostraSottoSezioneAuth = (sezioneNome) => {
+  const sezioni = ['login', 'registrati-cercatore', 'candidati-lavoratore-step1', 'candidati-lavoratore-step2', 'successo'];
+  
+  sezioni.forEach(s => {
+    const el = document.getElementById(`auth-sezione-${s}`);
+    if (el) el.style.display = (s === sezioneNome) ? 'flex' : 'none';
+  });
+
+  const titolo = document.getElementById("modal-reg-titolo");
+  const sottotitolo = document.getElementById("modal-reg-sottotitolo");
+
+  if (sezioneNome === 'login') {
+    if (titolo) titolo.innerText = "Accedi a Cercalo";
+    if (sottotitolo) sottotitolo.innerText = "Bentornato! Accedi per sbloccare i contatti e recensire.";
+  } else if (sezioneNome === 'registrati-cercatore') {
+    if (titolo) titolo.innerText = "Registrati come Cercatore";
+    if (sottotitolo) sottotitolo.innerText = "Crea un account gratuito per sbloccare i contatti degli artigiani.";
+  } else if (sezioneNome === 'candidati-lavoratore-step1') {
+    if (titolo) titolo.innerText = "Diventa un Lavoratore";
+    if (sottotitolo) sottotitolo.innerText = "Fase 1: Crea le credenziali d'accesso del tuo profilo.";
+  } else if (sezioneNome === 'candidati-lavoratore-step2') {
+    if (titolo) titolo.innerText = "Completa la tua Scheda";
+    if (sottotitolo) sottotitolo.innerText = "Fase 2: Inserisci i dettagli pubblici del tuo mestiere.";
+  } else if (sezioneNome === 'successo') {
+    if (titolo) titolo.innerText = "Operazione Completata!";
+    if (sottotitolo) sottotitolo.innerText = "Benvenuto nella community che aiuta con il cuore.";
+  }
+};
+
+// Apertura Modal Login
+window.apriModalLogin = () => {
+  const modal = document.getElementById("modal-registrazione");
+  if (modal) {
+    mostraSottoSezioneAuth('login');
+    modal.classList.add("attivo");
+  }
+};
+
+// Apertura Modal Registrazione Cercatore
+window.apriModalRegistrazioneCercatore = () => {
+  const modal = document.getElementById("modal-registrazione");
+  if (modal) {
+    mostraSottoSezioneAuth('registrati-cercatore');
+    modal.classList.add("attivo");
+  }
+};
+
+// Apertura Modal Registrazione Lavoratore
+window.apriModalRegistrazioneLavoratore = () => {
   const modal = document.getElementById("modal-registrazione");
   if (modal) {
     state.registrazioneStep = 1;
+    // Pulisci i form
+    const form1 = document.getElementById("form-lavoratore-step1");
+    const form2 = document.getElementById("form-lavoratore-step2");
+    if (form1) form1.reset();
+    if (form2) form2.reset();
     
-    const formAuth = document.getElementById("form-auth");
-    const successoBox = document.getElementById("auth-successo-box");
-    const tabSelector = document.querySelector(".tab-selector");
-    const formRegistratiCampi = document.getElementById("form-registrati-campi");
-    const formArtigiano = document.getElementById("form-registrati-artigiano");
-    const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
-    const modalTitolo = document.getElementById("modal-reg-titolo");
-    const submitBtn = document.getElementById("submit-modal-btn");
-    
-    if (formAuth) formAuth.style.display = "block";
-    if (successoBox) successoBox.style.display = "none";
-    if (tabSelector) tabSelector.style.display = "flex";
-    if (formRegistratiCampi) formRegistratiCampi.style.display = "flex";
-    if (formArtigiano) formArtigiano.style.display = "none";
-    if (quotaSpiegazione) quotaSpiegazione.style.display = "flex";
-    
-    const emailInput = document.getElementById("reg-email");
-    const passInput = document.getElementById("reg-password");
-    if (emailInput) emailInput.closest(".form-group").style.display = "block";
-    if (passInput) passInput.closest(".form-group").style.display = "block";
-    
-    const btnAccedi = document.getElementById("tab-accedi");
-    const btnRegistrati = document.getElementById("tab-registrati");
-    if (btnRegistrati) btnRegistrati.classList.add("attivo");
-    if (btnAccedi) btnAccedi.classList.remove("attivo");
-    
-    if (modalTitolo) modalTitolo.innerText = "Unisciti a Cercalo";
-    if (submitBtn) submitBtn.innerText = "Registrati e Sblocca i Contatti";
-    
+    mostraSottoSezioneAuth('candidati-lavoratore-step1');
     modal.classList.add("attivo");
   }
 };
 
 // Chiusura Modal Registrazione
-const chiudiModalRegistrazione = () => {
+window.chiudiModalRegistrazione = () => {
   const modal = document.getElementById("modal-registrazione");
   if (modal) {
     modal.classList.remove("attivo");
@@ -580,176 +611,131 @@ const chiudiLightbox = () => {
   }
 };
 
-// Cambia tab nel modal registrazione (Accedi / Registrati)
-window.cambiaTabModal = (tipo) => {
-  state.registrazioneStep = 1;
-  const btnAccedi = document.getElementById("tab-accedi");
-  const btnRegistrati = document.getElementById("tab-registrati");
-  const formRegistrati = document.getElementById("form-registrati-campi");
-  const formArtigiano = document.getElementById("form-registrati-artigiano");
-  const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
-  const submitBtn = document.getElementById("submit-modal-btn");
-  const modalTitolo = document.getElementById("modal-reg-titolo");
-
-  // Assicurati che le email/password parents siano visibili
-  const emailInput = document.getElementById("reg-email");
-  const passInput = document.getElementById("reg-password");
-  if (emailInput) emailInput.closest(".form-group").style.display = "block";
-  if (passInput) passInput.closest(".form-group").style.display = "block";
-  if (formArtigiano) formArtigiano.style.display = "none";
-
-  if (tipo === 'accedi') {
-    btnAccedi.classList.add("attivo");
-    btnRegistrati.classList.remove("attivo");
-    if (formRegistrati) formRegistrati.style.display = "none";
-    if (quotaSpiegazione) quotaSpiegazione.style.display = "none";
-    if (modalTitolo) modalTitolo.innerText = "Bentornato su Cercalo";
-    if (submitBtn) submitBtn.innerText = "Accedi Ora";
+// Gestione invio form LOGIN
+window.inviaFormLogin = (e) => {
+  e.preventDefault();
+  
+  const emailInput = document.getElementById("login-email").value.trim() || "utente@cercalo.it";
+  const nomeInput = "Membro di Cercalo";
+  
+  localStorage.setItem("cercalo_utente_email", emailInput);
+  localStorage.setItem("cercalo_utente_nome", nomeInput);
+  
+  state.utenteRegistrato = true;
+  localStorage.setItem("cercalo_registrato", "true");
+  aggiornaUIRegistrazione();
+  chiudiModalRegistrazione();
+  
+  if (state.artigianoSelezionato) {
+    setTimeout(() => {
+      apriModalDettagli(state.artigianoSelezionato);
+    }, 300);
   } else {
-    btnRegistrati.classList.add("attivo");
-    btnAccedi.classList.remove("attivo");
-    if (formRegistrati) formRegistrati.style.display = "flex";
-    if (quotaSpiegazione) quotaSpiegazione.style.display = "flex";
-    if (modalTitolo) modalTitolo.innerText = "Unisciti a Cercalo";
-    if (submitBtn) submitBtn.innerText = "Registrati e Sblocca i Contatti";
+    alert("Bentornato! Accesso eseguito con successo.");
   }
 };
 
-// Gestione dell'invio del form di registrazione/accesso
-const inviaFormRegistrazione = (e) => {
+// Gestione invio form REGISTRAZIONE CERCATORE
+window.inviaFormRegistrazioneCercatore = (e) => {
   e.preventDefault();
   
-  const btnRegistrati = document.getElementById("tab-registrati");
-  const isRegistrazione = btnRegistrati && btnRegistrati.classList.contains("attivo");
+  const nomeInput = document.getElementById("cercatore-nome").value.trim() || "Membro di Cercalo";
+  const emailInput = document.getElementById("cercatore-email").value.trim() || "utente@cercalo.it";
   
-  const emailInput = document.getElementById("reg-email").value.trim() || "utente@cercalo.it";
-  const nomeInput = document.getElementById("reg-nome").value.trim() || "Membro di Cercalo";
+  localStorage.setItem("cercalo_utente_email", emailInput);
+  localStorage.setItem("cercalo_utente_nome", nomeInput);
   
-  if (isRegistrazione) {
-    const ruoloInput = document.getElementById("reg-ruolo").value;
-    
-    // Se è lavoratore (aiutante o professionista) e siamo al primo step
-    if ((ruoloInput === "aiutante" || ruoloInput === "professionista") && state.registrazioneStep !== 2) {
-      // Passa allo Step 2 (Dettagli Artigiano)
-      state.registrazioneStep = 2;
-      
-      const formRegistratiCampi = document.getElementById("form-registrati-campi");
-      const formArtigiano = document.getElementById("form-registrati-artigiano");
-      const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
-      const tabSelector = document.querySelector(".tab-selector");
-      const modalTitolo = document.getElementById("modal-reg-titolo");
-      const submitBtn = document.getElementById("submit-modal-btn");
-      
-      // Nascondi campi base email/password e step 1
-      const regEmail = document.getElementById("reg-email");
-      const regPassword = document.getElementById("reg-password");
-      if (regEmail) regEmail.closest(".form-group").style.display = "none";
-      if (regPassword) regPassword.closest(".form-group").style.display = "none";
-      
-      if (formRegistratiCampi) formRegistratiCampi.style.display = "none";
-      if (quotaSpiegazione) quotaSpiegazione.style.display = "none";
-      if (tabSelector) tabSelector.style.display = "none"; // blocca tab
-      
-      // Mostra modulo dettagli artigiano
-      if (formArtigiano) formArtigiano.style.display = "flex";
-      
-      if (modalTitolo) modalTitolo.innerText = "Completa il Profilo Lavoratore";
-      if (submitBtn) submitBtn.innerText = "Invia Candidatura per Approvazione";
-      
-      // Pre-compila campi opzionali
-      const qualificaInput = document.getElementById("reg-qualifica");
-      if (qualificaInput) {
-        qualificaInput.value = ruoloInput === "professionista" ? "Professionista" : "Tuttofare";
-      }
-      
-      return; // Interrompi per far compilare Step 2
-    }
-    
-    // Se siamo a Step 2 o se è un Cercatore comune
-    localStorage.setItem("cercalo_utente_email", emailInput);
-    localStorage.setItem("cercalo_utente_nome", nomeInput);
-    
-    state.utenteRegistrato = true;
-    localStorage.setItem("cercalo_registrato", "true");
-    aggiornaUIRegistrazione();
-    
-    const formAuth = document.getElementById("form-auth");
-    const successoBox = document.getElementById("auth-successo-box");
-    const successoTitolo = document.getElementById("successo-titolo");
-    const successoMsg = document.getElementById("successo-msg");
-    
-    if (formAuth) formAuth.style.display = "none";
-    if (successoBox) successoBox.style.display = "block";
-    
-    if (ruoloInput === "cercatore") {
-      if (successoTitolo) successoTitolo.innerText = "Benvenuto su Cercalo!";
-      if (successoMsg) successoMsg.innerText = "La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici, inviare email agli artigiani e recensire i loro servizi.";
-    } else {
-      // Crea il profilo artigiano/professionista
-      const avatarVal = document.getElementById("reg-avatar").value;
-      const qualificaVal = document.getElementById("reg-qualifica").value.trim() || (ruoloInput === "professionista" ? "Professionista" : "Aiutante");
-      const categoriaVal = document.getElementById("reg-categoria-opt").value;
-      const cittaVal = document.getElementById("reg-citta").value.trim() || "Messina";
-      const telefonoVal = document.getElementById("reg-telefono").value.trim() || "Non fornito";
-      const prezzoVal = document.getElementById("reg-prezzo").value.trim() || "Da concordare";
-      const bioVal = document.getElementById("reg-bio").value.trim() || "Disponibile per la community di Cercalo.";
-      
-      const nuovoArtigiano = {
-        id: Date.now(),
-        nome: nomeInput,
-        ruolo: qualificaVal,
-        citta: cittaVal,
-        biografia: bioVal,
-        cuori: 5.0,
-        recensioniCount: 0,
-        prezzo: prezzoVal,
-        categoria: categoriaVal,
-        tipoHelper: ruoloInput,
-        avatar: avatarVal,
-        facSimile: false,
-        approvato: false, // Richiede approvazione dell'amministratore!
-        promoGratis: true,
-        contatti: {
-          telefono: telefonoVal,
-          email: emailInput
-        },
-        recensioni: []
-      };
-      
-      ARTIGIANI.push(nuovoArtigiano);
-      localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
-      
-      if (successoTitolo) successoTitolo.innerText = "Candidatura Ricevuta!";
-      if (successoMsg) {
-        successoMsg.innerHTML = `
-          Grazie per esserti candidato su Cercalo, <strong>${nomeInput}</strong>!<br><br>
-          Il tuo profilo professionale è stato inviato per l'<strong>approvazione preventiva dell'amministratore</strong>. 
-          Ti contatteremo via email all'indirizzo <em>${emailInput}</em> per definire l'attivazione e concordare il pagamento della quota simbolica annuale (5€/anno, primo anno gratuito).
-        `;
-      }
-    }
-    
-    state.registrazioneStep = 1;
-    
-  } else {
-    // Caso: ACCEDO AD UN ACCOUNT ESISTENTE
-    localStorage.setItem("cercalo_utente_email", emailInput);
-    localStorage.setItem("cercalo_utente_nome", nomeInput);
-    
-    state.utenteRegistrato = true;
-    localStorage.setItem("cercalo_registrato", "true");
-    aggiornaUIRegistrazione();
-    chiudiModalRegistrazione();
-    
-    // Se c'era un artigiano selezionato, aprilo
-    if (state.artigianoSelezionato) {
-      setTimeout(() => {
-        apriModalDettagli(state.artigianoSelezionato);
-      }, 300);
-    } else {
-      alert("Bentornato! Accesso eseguito con successo.");
-    }
+  state.utenteRegistrato = true;
+  localStorage.setItem("cercalo_registrato", "true");
+  aggiornaUIRegistrazione();
+  
+  const successoTitolo = document.getElementById("successo-titolo-nuovo");
+  const successoMsg = document.getElementById("successo-msg-nuovo");
+  if (successoTitolo) successoTitolo.innerText = "Benvenuto su Cercalo!";
+  if (successoMsg) successoMsg.innerText = "La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici e le email degli artigiani e recensire i loro servizi.";
+  
+  mostraSottoSezioneAuth('successo');
+};
+
+// Gestione invio form CANDIDATURA LAVORATORE STEP 1
+window.inviaFormLavoratoreStep1 = (e) => {
+  e.preventDefault();
+  
+  state.tempLavoratore = {
+    nome: document.getElementById("lavoratore-nome").value.trim(),
+    email: document.getElementById("lavoratore-email").value.trim(),
+    tipo: document.getElementById("lavoratore-tipo").value
+  };
+  
+  // Pre-imposta qualifica nello Step 2
+  const qualificaInput = document.getElementById("lavoratore-qualifica");
+  if (qualificaInput) {
+    qualificaInput.value = state.tempLavoratore.tipo === "professionista" ? "Professionista" : "Tuttofare";
   }
+  
+  mostraSottoSezioneAuth('candidati-lavoratore-step2');
+};
+
+// Gestione invio form CANDIDATURA LAVORATORE STEP 2
+window.inviaFormLavoratoreStep2 = (e) => {
+  e.preventDefault();
+  if (!state.tempLavoratore) return;
+  
+  const avatarVal = document.getElementById("lavoratore-avatar").value;
+  const qualificaVal = document.getElementById("lavoratore-qualifica").value.trim() || (state.tempLavoratore.tipo === "professionista" ? "Professionista" : "Aiutante");
+  const categoriaVal = document.getElementById("lavoratore-categoria").value;
+  const cittaVal = document.getElementById("lavoratore-citta").value.trim() || "Messina";
+  const telefonoVal = document.getElementById("lavoratore-telefono").value.trim() || "Non fornito";
+  const prezzoVal = document.getElementById("lavoratore-prezzo").value.trim() || "Da concordare";
+  const bioVal = document.getElementById("lavoratore-bio").value.trim() || "Disponibile per la community di Cercalo.";
+  
+  const nuovoArtigiano = {
+    id: Date.now(),
+    nome: state.tempLavoratore.nome,
+    ruolo: qualificaVal,
+    citta: cittaVal,
+    biografia: bioVal,
+    cuori: 5.0,
+    recensioniCount: 0,
+    prezzo: prezzoVal,
+    categoria: categoriaVal,
+    tipoHelper: state.tempLavoratore.tipo,
+    avatar: avatarVal,
+    facSimile: false,
+    approvato: false, // Richiede approvazione dell'amministratore!
+    promoGratis: true,
+    contatti: {
+      telefono: telefonoVal,
+      email: state.tempLavoratore.email
+    },
+    recensioni: []
+  };
+  
+  ARTIGIANI.push(nuovoArtigiano);
+  localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
+  
+  // Salva stato d'accesso per il candidato
+  localStorage.setItem("cercalo_utente_email", state.tempLavoratore.email);
+  localStorage.setItem("cercalo_utente_nome", state.tempLavoratore.nome);
+  
+  state.utenteRegistrato = true;
+  localStorage.setItem("cercalo_registrato", "true");
+  aggiornaUIRegistrazione();
+  
+  const successoTitolo = document.getElementById("successo-titolo-nuovo");
+  const successoMsg = document.getElementById("successo-msg-nuovo");
+  
+  if (successoTitolo) successoTitolo.innerText = "Candidatura Inviata!";
+  if (successoMsg) {
+    successoMsg.innerHTML = `
+      Grazie per esserti candidato su Cercalo, <strong>${state.tempLavoratore.nome}</strong>!<br><br>
+      Il tuo profilo professionale è stato inviato per l'<strong>approvazione preventiva dell'amministratore</strong>. 
+      Ti contatteremo via email all'indirizzo <em>${state.tempLavoratore.email}</em> per definire l'attivazione e concordare il pagamento della quota simbolica annuale (5€/anno, primo anno gratuito).
+    `;
+  }
+  
+  mostraSottoSezioneAuth('successo');
+  state.tempLavoratore = null;
 };
 
 // Modal Profilo Utente
@@ -893,11 +879,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Listener del form del Modal
-  const formModal = document.getElementById("form-auth");
-  if (formModal) {
-    formModal.addEventListener("submit", inviaFormRegistrazione);
-  }
+
 
   // Overlay Click chiude i modal
   const overlays = document.querySelectorAll(".modal-overlay");

@@ -7,7 +7,7 @@
   <title>Cercalo - Troviamo chi ti aiuta con il cuore</title>
   <link rel="icon" type="image/png" href="Loghi/logo_terracotta_scontornato.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="index.css?v=8.0">
+  <link rel="stylesheet" href="index.css?v=9.0">
 </head>
 <body>
 
@@ -35,7 +35,8 @@
       </a>
       <nav class="nav-links">
         <button class="btn-nav-info" onclick="mostraFilosofia()">La Nostra Filosofia</button>
-        <button id="btn-header-accedi" class="btn-accedi" onclick="apriModalRegistrazione()">Accedi / Registrati</button>
+        <button id="btn-header-registrati-lavoratore" class="btn-accedi" onclick="apriModalRegistrazioneLavoratore()" style="background-color: var(--primary-pesca); color: white; border: none;">Lavora con noi</button>
+        <button id="btn-header-accedi" class="btn-accedi" onclick="apriModalLogin()">Accedi</button>
       </nav>
     </div>
   </header>
@@ -147,6 +148,7 @@
       <div class="footer-links">
         <a class="footer-link" href="chi-siamo.html">La Nostra Filosofia</a>
         <a class="footer-link" href="legal.html">Termini & Privacy</a>
+        <a class="footer-link" href="#" onclick="apriModalRegistrazioneLavoratore(); return false;" style="color: var(--primary-pesca); font-weight: 600;">Registrati come Lavoratore</a>
         <a class="footer-link" href="admin.html" style="color: var(--primary-pesca-dark); border-bottom: 1px dashed var(--primary-pesca-dark);">Area Riservata Admin</a>
       </div>
       
@@ -166,57 +168,94 @@
       <button class="modal-close">✕</button>
       
       <div class="modal-header">
-        <h2 id="modal-reg-titolo" class="modal-titolo">Unisciti a Cercalo</h2>
-        <p class="modal-sottotitolo">Fai parte di una community protetta e basata sulla fiducia.</p>
+        <h2 id="modal-reg-titolo" class="modal-titolo">Accedi a Cercalo</h2>
+        <p id="modal-reg-sottotitolo" class="modal-sottotitolo">Fai parte di una community protetta e basata sulla fiducia.</p>
       </div>
 
-      <div class="tab-selector">
-        <button id="tab-registrati" class="tab-btn attivo" onclick="cambiaTabModal('registrati')">Registrati</button>
-        <button id="tab-accedi" class="tab-btn" onclick="cambiaTabModal('accedi')">Ho già un account</button>
-      </div>
-
-      <!-- Box informativo quota di 5€ -->
-      <div id="quota-spiegazione-box" class="quota-box">
-        <span class="qb-icon">🌸</span>
-        <div class="qb-text">
-          <h4 class="qb-titolo">Quota mutuale di 5€ all'anno</h4>
-          Contributo simbolico per sostenere e mantenere la piattaforma, finanziare i servizi e proteggere i dati della community. Nessun canone nascosto.
-        </div>
-      </div>
-
-      <form id="form-auth" class="modal-form">
-        <div class="form-group">
-          <label class="form-label" for="reg-email">Indirizzo Email</label>
-          <input type="email" id="reg-email" class="form-input" placeholder="esempio@email.com" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="reg-password">Password</label>
-          <input type="password" id="reg-password" class="form-input" placeholder="Crea una password sicura" required>
-        </div>
-        
-        <div id="form-registrati-campi" style="display: flex; flex-direction: column; gap: 16px;">
+      <!-- SEZIONE 1: ACCEDI (LOGIN) -->
+      <div id="auth-sezione-login" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+        <form id="form-login" class="modal-form" onsubmit="inviaFormLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="reg-nome">Nome Completo</label>
-            <input type="text" id="reg-nome" class="form-input" placeholder="Nome Cognome">
+            <label class="form-label" for="login-email">Indirizzo Email</label>
+            <input type="email" id="login-email" class="form-input" placeholder="esempio@email.com" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-ruolo">Chi sei?</label>
-            <select id="reg-ruolo" class="form-input">
-              <option value="cercatore">Sono un Cercatore (cerco aiuto)</option>
-              <option value="aiutante">Voglio Aiutare (Aiutante di Quartiere - Offerta Libera)</option>
-              <option value="professionista">Offro Servizi Professionali (Professionista con Partita IVA)</option>
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="La tua password" required>
+          </div>
+          <button type="submit" class="btn-cerca" style="width: 100%; margin-top: 10px;">Accedi Ora</button>
+        </form>
+        <div style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--color-testo-mutato); line-height: 1.5;">
+          Non hai un account? <a href="#" onclick="mostraSottoSezioneAuth('registrati-cercatore'); return false;" style="color: var(--primary-pesca); font-weight: 700; text-decoration: none;">Registrati come Cercatore</a>
+          <br><br>
+          Vuoi collaborare con noi? <a href="#" onclick="mostraSottoSezioneAuth('candidati-lavoratore-step1'); return false;" style="color: var(--primary-pesca-dark); font-weight: 700; text-decoration: none;">Candidati come Lavoratore</a>
+        </div>
+      </div>
+
+      <!-- SEZIONE 2: REGISTRATI COME CERCATORE -->
+      <div id="auth-sezione-registrati-cercatore" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
+        <form id="form-registrati-cercatore" class="modal-form" onsubmit="inviaFormRegistrazioneCercatore(event)">
+          <div class="form-group">
+            <label class="form-label" for="cercatore-nome">Nome Completo</label>
+            <input type="text" id="cercatore-nome" class="form-input" placeholder="Nome Cognome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cercatore-email">Indirizzo Email</label>
+            <input type="email" id="cercatore-email" class="form-input" placeholder="esempio@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cercatore-password">Password</label>
+            <input type="password" id="cercatore-password" class="form-input" placeholder="Crea una password sicura" required>
+          </div>
+          <button type="submit" class="btn-cerca" style="width: 100%; margin-top: 10px;">Registrati e Sblocca i Contatti</button>
+        </form>
+        <div style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--color-testo-mutato);">
+          Hai già un account? <a href="#" onclick="mostraSottoSezioneAuth('login'); return false;" style="color: var(--primary-pesca); font-weight: 700; text-decoration: none;">Accedi</a>
+        </div>
+      </div>
+
+      <!-- SEZIONE 3: CANDIDATI COME LAVORATORE STEP 1 -->
+      <div id="auth-sezione-candidati-lavoratore-step1" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
+        <div class="quota-box" style="margin-bottom: 5px;">
+          <span class="qb-icon">🌸</span>
+          <div class="qb-text">
+            <h4 class="qb-titolo">Quota mutuale di 5€ all'anno</h4>
+            Contributo simbolico per sostenere e mantenere la bacheca, finanziare i servizi e proteggere la community. Primo anno totalmente gratuito.
+          </div>
+        </div>
+        <form id="form-lavoratore-step1" class="modal-form" onsubmit="inviaFormLavoratoreStep1(event)">
+          <div class="form-group">
+            <label class="form-label" for="lavoratore-nome">Nome Completo</label>
+            <input type="text" id="lavoratore-nome" class="form-input" placeholder="Nome Cognome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lavoratore-email">Indirizzo Email</label>
+            <input type="email" id="lavoratore-email" class="form-input" placeholder="esempio@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lavoratore-password">Password</label>
+            <input type="password" id="lavoratore-password" class="form-input" placeholder="Crea una password sicura" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lavoratore-tipo">Tipo di Profilo Lavoratore</label>
+            <select id="lavoratore-tipo" class="form-input">
+              <option value="aiutante">Aiutante di Quartiere (Hobbista - Offerta Libera)</option>
+              <option value="professionista">Professionista con Partita IVA (Offro tariffe oneste)</option>
             </select>
           </div>
+          <button type="submit" class="btn-cerca" style="width: 100%; margin-top: 10px;">Procedi al Profilo Pubblico →</button>
+        </form>
+        <div style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--color-testo-mutato);">
+          Hai già un account? <a href="#" onclick="mostraSottoSezioneAuth('login'); return false;" style="color: var(--primary-pesca); font-weight: 700; text-decoration: none;">Accedi</a>
         </div>
+      </div>
 
-        <!-- Form Candidatura Lavoratore (Step 2) -->
-        <div id="form-registrati-artigiano" style="display: none; flex-direction: column; gap: 16px; margin-top: 16px;">
-          <div style="font-size: 13px; color: var(--primary-pesca); font-weight: 700; margin-bottom: 4px; border-bottom: 1px solid rgba(200, 106, 81, 0.12); padding-bottom: 8px;">
-            COMPLETA IL TUO PROFILO PUBBLICO (Approvazione Preventiva)
-          </div>
+      <!-- SEZIONE 4: CANDIDATI COME LAVORATORE STEP 2 -->
+      <div id="auth-sezione-candidati-lavoratore-step2" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
+        <form id="form-lavoratore-step2" class="modal-form" onsubmit="inviaFormLavoratoreStep2(event)">
           <div class="form-group">
-            <label class="form-label" for="reg-avatar">Seleziona il tuo Simbolo / Emoji</label>
-            <select id="reg-avatar" class="form-input">
+            <label class="form-label" for="lavoratore-avatar">Seleziona il tuo Simbolo / Emoji</label>
+            <select id="lavoratore-avatar" class="form-input">
               <option value="👨‍🔧">👨‍🔧 Tuttofare</option>
               <option value="🔧">🔧 Idraulico</option>
               <option value="⚡">⚡ Elettricista</option>
@@ -234,12 +273,12 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-qualifica">Qualifica / Ruolo Specifico</label>
-            <input type="text" id="reg-qualifica" class="form-input" placeholder="Es. Tuttofare Gentile, Idraulico Rapido, Assistente Anziani">
+            <label class="form-label" for="lavoratore-qualifica">Qualifica / Ruolo Specifico</label>
+            <input type="text" id="lavoratore-qualifica" class="form-input" placeholder="Es. Idraulico Rapido, Falegname Creativo, Tuttofare Gentile" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-categoria-opt">Categoria Principale</label>
-            <select id="reg-categoria-opt" class="form-input">
+            <label class="form-label" for="lavoratore-categoria">Categoria Principale</label>
+            <select id="lavoratore-categoria" class="form-input">
               <option value="tuttofare">Tuttofare</option>
               <option value="idraulico">Idraulico</option>
               <option value="elettricista">Elettricista</option>
@@ -247,40 +286,37 @@
               <option value="assistenza">Assistenza / Cura Persona</option>
               <option value="artigianato">Artigianato / Falegname</option>
               <option value="artista">Artista / Decoratore</option>
-              <option value="altro">Altro (specificato sotto)</option>
+              <option value="altro">Altro</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-citta">Città Operativa</label>
-            <input type="text" id="reg-citta" class="form-input" placeholder="Es. Milano, Roma, Messina">
+            <label class="form-label" for="lavoratore-citta">Città Operativa</label>
+            <input type="text" id="lavoratore-citta" class="form-input" placeholder="Es. Milano, Roma, Messina" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-telefono">Numero di Telefono (Sbloccato solo dopo iscrizione)</label>
-            <input type="text" id="reg-telefono" class="form-input" placeholder="Es. 333 1234567">
+            <label class="form-label" for="lavoratore-telefono">Numero di Telefono (Sbloccato solo dopo iscrizione)</label>
+            <input type="text" id="lavoratore-telefono" class="form-input" placeholder="Es. 333 1234567" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-prezzo">Tariffa di Riferimento / Compensi</label>
-            <input type="text" id="reg-prezzo" class="form-input" placeholder="Es. Offerta Libera, €30 chiamata + preventivo">
+            <label class="form-label" for="lavoratore-prezzo">Tariffa di Riferimento / Compensi</label>
+            <input type="text" id="lavoratore-prezzo" class="form-input" placeholder="Es. Offerta Libera, €30 chiamata + preventivo" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-bio">Biografia / Chi sei e come offri aiuto con il cuore</label>
-            <textarea id="reg-bio" class="form-input" rows="3" placeholder="Scrivi una breve biografia per farti conoscere..."></textarea>
+            <label class="form-label" for="lavoratore-bio">Biografia / Chi sei e come offri aiuto con il cuore</label>
+            <textarea id="lavoratore-bio" class="form-input" rows="3" placeholder="Scrivi una breve biografia per farti conoscere..." required></textarea>
           </div>
-        </div>
+          <button type="submit" class="btn-cerca" style="width: 100%; margin-top: 10px;">Invia Candidatura per Approvazione</button>
+        </form>
+      </div>
 
-        <button type="submit" id="submit-modal-btn" class="btn-cerca" style="width: 100%; margin-top: 10px;">
-          Registrati e Sblocca i Contatti
-        </button>
-      </form>
-
-      <!-- Box successo candidatura / registrazione -->
-      <div id="auth-successo-box" style="display: none; text-align: center; padding: 20px 10px;">
+      <!-- SEZIONE 5: SUCCESSO BOX -->
+      <div id="auth-sezione-successo" style="display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px; width: 100%;">
         <span style="font-size: 48px; display: block; margin-bottom: 16px;">🎉</span>
-        <h3 id="successo-titolo" style="font-family: var(--font-titoli); font-size: 20px; color: var(--color-testo); margin-bottom: 8px;">Benvenuto su Cercalo!</h3>
-        <p id="successo-msg" style="font-size: 14px; line-height: 1.6; color: var(--color-testo-mutato); margin-bottom: 20px;">
+        <h3 id="successo-titolo-nuovo" style="font-family: var(--font-titoli); font-size: 20px; color: var(--color-testo); margin-bottom: 8px;">Benvenuto su Cercalo!</h3>
+        <p id="successo-msg-nuovo" style="font-size: 14px; line-height: 1.6; color: var(--color-testo-mutato); margin-bottom: 20px;">
           La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici e le email degli artigiani e recensire i loro servizi.
         </p>
-        <button class="btn-cerca" onclick="chiudiModalRegistrazione(); location.reload();" style="width: 100%;">Accedi Subito</button>
+        <button class="btn-cerca" onclick="chiudiModalRegistrazione(); location.reload();" style="width: 100%;">Chiudi e Sblocca</button>
       </div>
 
     </div>
@@ -367,6 +403,6 @@
     </div>
   </div>
 
-  <script src="index.js?v=8.0"></script>
+  <script src="index.js?v=9.0"></script>
 </body>
 </html>
