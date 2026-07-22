@@ -181,7 +181,9 @@ const state = {
   categoriaAttiva: "",
   filtroTesto: "",
   filtroCitta: "",
-  artigianoSelezionato: null // Memorizza a quale artigiano l'utente voleva accedere
+  artigianoSelezionato: null, // Memorizza a quale artigiano l'utente voleva accedere
+  preferiti: [],
+  soloPreferiti: false
 };
 
 let ARTIGIANI = [];
@@ -225,6 +227,14 @@ const caricaStato = () => {
   if (reg === "true") {
     state.utenteRegistrato = true;
     aggiornaUIRegistrazione();
+  }
+  const pref = localStorage.getItem("cercalo_preferiti");
+  if (pref) {
+    try {
+      state.preferiti = JSON.parse(pref);
+    } catch (e) {
+      state.preferiti = [];
+    }
   }
 };
 
@@ -304,9 +314,12 @@ const renderCategorieRapide = () => {
   // Filtra quelle che non sono già incluse nelle predefinite
   const customCategorie = tutteCategorie.filter(cat => cat && !predefinite.some(p => p.id === cat));
 
-  // Genera HTML dei pulsanti
-  let html = predefinite.map(p => {
-    const attivaClass = state.categoriaAttiva === p.id ? "categoria-pill attiva" : "categoria-pill";
+  // Genera HTML dei pulsanti, aggiungendo la pill dei preferiti all'inizio
+  const favAttivaClass = state.soloPreferiti ? "categoria-pill attiva preferiti-pill" : "categoria-pill preferiti-pill";
+  let html = `<button class="${favAttivaClass}" onclick="toggleFiltroPreferiti(this)" style="border-color: var(--primary-pesca); color: var(--primary-pesca); font-weight: bold;">❤️ Preferiti (${state.preferiti.length})</button>`;
+
+  html += predefinite.map(p => {
+    const attivaClass = (!state.soloPreferiti && state.categoriaAttiva === p.id) ? "categoria-pill attiva" : "categoria-pill";
     return `<button class="${attivaClass}" onclick="selezionaCategoria('${p.id}', this)">${p.nome}</button>`;
   }).join("");
 
@@ -314,7 +327,7 @@ const renderCategorieRapide = () => {
   customCategorie.forEach(cat => {
     const nomeVisualizzato = cat.charAt(0).toUpperCase() + cat.slice(1);
     const emoji = ottieniEmojiPerCategoria(cat);
-    const attivaClass = state.categoriaAttiva === cat ? "categoria-pill attiva" : "categoria-pill";
+    const attivaClass = (!state.soloPreferiti && state.categoriaAttiva === cat) ? "categoria-pill attiva" : "categoria-pill";
     html += `<button class="${attivaClass}" onclick="selezionaCategoria('${cat}', this)">${emoji} ${nomeVisualizzato}</button>`;
   });
 
@@ -332,6 +345,9 @@ const renderArtigiani = () => {
     // Escludi i profili non approvati
     if (art.approvato === false) return false;
 
+    // Applica filtro preferiti
+    if (state.soloPreferiti && !state.preferiti.includes(art.id)) return false;
+
     const matchCategoria = !state.categoriaAttiva || art.categoria === state.categoriaAttiva;
     
     const testoRicerca = state.filtroTesto.toLowerCase().trim();
@@ -348,7 +364,9 @@ const renderArtigiani = () => {
 
   // Aggiorna il titolo della sezione risultati
   if (titoloRisultati) {
-    if (state.categoriaAttiva || state.filtroTesto || state.filtroCitta) {
+    if (state.soloPreferiti) {
+      titoloRisultati.innerText = `I tuoi artigiani preferiti (${risultati.length})`;
+    } else if (state.categoriaAttiva || state.filtroTesto || state.filtroCitta) {
       titoloRisultati.innerText = `Persone disponibili con il cuore (${risultati.length})`;
     } else {
       titoloRisultati.innerText = `Alcune delle persone splendide iscritte a Cercalo`;
@@ -357,13 +375,23 @@ const renderArtigiani = () => {
 
   // Genera HTML delle card
   if (risultati.length === 0) {
-    griglia.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 28px; box-shadow: var(--shadow-nuvola);">
-        <p style="font-size: 24px; margin-bottom: 10px;">🌸</p>
-        <p style="font-weight: 600; color: var(--color-testo);">Nessuna persona corrisponde alla ricerca al momento.</p>
-        <p style="color: var(--color-testo-mutato); font-size: 14px; margin-top: 5px;">Prova a cercare con parole più semplici o contatta la nostra community per un aiuto.</p>
-      </div>
-    `;
+    if (state.soloPreferiti) {
+      griglia.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 28px; box-shadow: var(--shadow-nuvola);">
+          <p style="font-size: 32px; margin-bottom: 10px;">❤️</p>
+          <p style="font-weight: 600; color: var(--color-testo);">La tua lista dei preferiti è vuota.</p>
+          <p style="color: var(--color-testo-mutato); font-size: 14px; margin-top: 5px;">Clicca sul cuoricino in alto a destra sulle schede degli artigiani per salvarli qui.</p>
+        </div>
+      `;
+    } else {
+      griglia.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 28px; box-shadow: var(--shadow-nuvola);">
+          <p style="font-size: 24px; margin-bottom: 10px;">🌸</p>
+          <p style="font-weight: 600; color: var(--color-testo);">Nessuna persona corrisponde alla ricerca al momento.</p>
+          <p style="color: var(--color-testo-mutato); font-size: 14px; margin-top: 5px;">Prova a cercare con parole più semplici o contatta la nostra community per un aiuto.</p>
+        </div>
+      `;
+    }
     return;
   }
 
@@ -380,9 +408,15 @@ const renderArtigiani = () => {
 
     const facsimileHTML = art.facSimile ? `<span class="badge-facsimile">Fac-Simile</span>` : '';
 
+    const isPreferito = state.preferiti.includes(art.id);
+    const preferitoIcon = isPreferito ? '❤️' : '🤍';
+
     return `
       <article class="card-artigiano" data-id="${art.id}">
         ${facsimileHTML}
+        <button class="preferito-btn" onclick="togglePreferito(${art.id}, event)" aria-label="Aggiungi ai preferiti">
+          ${preferitoIcon}
+        </button>
         <div class="card-header-art">
           <div class="avatar-art">${art.avatar}</div>
           <div class="info-header-art">
@@ -435,6 +469,37 @@ window.gestisciContatto = (id) => {
 const apriModalRegistrazione = () => {
   const modal = document.getElementById("modal-registrazione");
   if (modal) {
+    state.registrazioneStep = 1;
+    
+    const formAuth = document.getElementById("form-auth");
+    const successoBox = document.getElementById("auth-successo-box");
+    const tabSelector = document.querySelector(".tab-selector");
+    const formRegistratiCampi = document.getElementById("form-registrati-campi");
+    const formArtigiano = document.getElementById("form-registrati-artigiano");
+    const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
+    const modalTitolo = document.getElementById("modal-reg-titolo");
+    const submitBtn = document.getElementById("submit-modal-btn");
+    
+    if (formAuth) formAuth.style.display = "block";
+    if (successoBox) successoBox.style.display = "none";
+    if (tabSelector) tabSelector.style.display = "flex";
+    if (formRegistratiCampi) formRegistratiCampi.style.display = "flex";
+    if (formArtigiano) formArtigiano.style.display = "none";
+    if (quotaSpiegazione) quotaSpiegazione.style.display = "flex";
+    
+    const emailInput = document.getElementById("reg-email");
+    const passInput = document.getElementById("reg-password");
+    if (emailInput) emailInput.closest(".form-group").style.display = "block";
+    if (passInput) passInput.closest(".form-group").style.display = "block";
+    
+    const btnAccedi = document.getElementById("tab-accedi");
+    const btnRegistrati = document.getElementById("tab-registrati");
+    if (btnRegistrati) btnRegistrati.classList.add("attivo");
+    if (btnAccedi) btnAccedi.classList.remove("attivo");
+    
+    if (modalTitolo) modalTitolo.innerText = "Unisciti a Cercalo";
+    if (submitBtn) submitBtn.innerText = "Registrati e Sblocca i Contatti";
+    
     modal.classList.add("attivo");
   }
 };
@@ -517,12 +582,21 @@ const chiudiLightbox = () => {
 
 // Cambia tab nel modal registrazione (Accedi / Registrati)
 window.cambiaTabModal = (tipo) => {
+  state.registrazioneStep = 1;
   const btnAccedi = document.getElementById("tab-accedi");
   const btnRegistrati = document.getElementById("tab-registrati");
   const formRegistrati = document.getElementById("form-registrati-campi");
+  const formArtigiano = document.getElementById("form-registrati-artigiano");
   const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
   const submitBtn = document.getElementById("submit-modal-btn");
   const modalTitolo = document.getElementById("modal-reg-titolo");
+
+  // Assicurati che le email/password parents siano visibili
+  const emailInput = document.getElementById("reg-email");
+  const passInput = document.getElementById("reg-password");
+  if (emailInput) emailInput.closest(".form-group").style.display = "block";
+  if (passInput) passInput.closest(".form-group").style.display = "block";
+  if (formArtigiano) formArtigiano.style.display = "none";
 
   if (tipo === 'accedi') {
     btnAccedi.classList.add("attivo");
@@ -545,25 +619,136 @@ window.cambiaTabModal = (tipo) => {
 const inviaFormRegistrazione = (e) => {
   e.preventDefault();
   
+  const btnRegistrati = document.getElementById("tab-registrati");
+  const isRegistrazione = btnRegistrati && btnRegistrati.classList.contains("attivo");
+  
   const emailInput = document.getElementById("reg-email").value.trim() || "utente@cercalo.it";
   const nomeInput = document.getElementById("reg-nome").value.trim() || "Membro di Cercalo";
   
-  localStorage.setItem("cercalo_utente_email", emailInput);
-  localStorage.setItem("cercalo_utente_nome", nomeInput);
-  
-  // Salva stato
-  state.utenteRegistrato = true;
-  localStorage.setItem("cercalo_registrato", "true");
-  aggiornaUIRegistrazione();
-  chiudiModalRegistrazione();
-
-  // Se l'utente voleva contattare qualcuno, apri i dettagli di quell'artigiano immediatamente
-  if (state.artigianoSelezionato) {
-    setTimeout(() => {
-      apriModalDettagli(state.artigianoSelezionato);
-    }, 300);
+  if (isRegistrazione) {
+    const ruoloInput = document.getElementById("reg-ruolo").value;
+    
+    // Se è lavoratore (aiutante o professionista) e siamo al primo step
+    if ((ruoloInput === "aiutante" || ruoloInput === "professionista") && state.registrazioneStep !== 2) {
+      // Passa allo Step 2 (Dettagli Artigiano)
+      state.registrazioneStep = 2;
+      
+      const formRegistratiCampi = document.getElementById("form-registrati-campi");
+      const formArtigiano = document.getElementById("form-registrati-artigiano");
+      const quotaSpiegazione = document.getElementById("quota-spiegazione-box");
+      const tabSelector = document.querySelector(".tab-selector");
+      const modalTitolo = document.getElementById("modal-reg-titolo");
+      const submitBtn = document.getElementById("submit-modal-btn");
+      
+      // Nascondi campi base email/password e step 1
+      const regEmail = document.getElementById("reg-email");
+      const regPassword = document.getElementById("reg-password");
+      if (regEmail) regEmail.closest(".form-group").style.display = "none";
+      if (regPassword) regPassword.closest(".form-group").style.display = "none";
+      
+      if (formRegistratiCampi) formRegistratiCampi.style.display = "none";
+      if (quotaSpiegazione) quotaSpiegazione.style.display = "none";
+      if (tabSelector) tabSelector.style.display = "none"; // blocca tab
+      
+      // Mostra modulo dettagli artigiano
+      if (formArtigiano) formArtigiano.style.display = "flex";
+      
+      if (modalTitolo) modalTitolo.innerText = "Completa il Profilo Lavoratore";
+      if (submitBtn) submitBtn.innerText = "Invia Candidatura per Approvazione";
+      
+      // Pre-compila campi opzionali
+      const qualificaInput = document.getElementById("reg-qualifica");
+      if (qualificaInput) {
+        qualificaInput.value = ruoloInput === "professionista" ? "Professionista" : "Tuttofare";
+      }
+      
+      return; // Interrompi per far compilare Step 2
+    }
+    
+    // Se siamo a Step 2 o se è un Cercatore comune
+    localStorage.setItem("cercalo_utente_email", emailInput);
+    localStorage.setItem("cercalo_utente_nome", nomeInput);
+    
+    state.utenteRegistrato = true;
+    localStorage.setItem("cercalo_registrato", "true");
+    aggiornaUIRegistrazione();
+    
+    const formAuth = document.getElementById("form-auth");
+    const successoBox = document.getElementById("auth-successo-box");
+    const successoTitolo = document.getElementById("successo-titolo");
+    const successoMsg = document.getElementById("successo-msg");
+    
+    if (formAuth) formAuth.style.display = "none";
+    if (successoBox) successoBox.style.display = "block";
+    
+    if (ruoloInput === "cercatore") {
+      if (successoTitolo) successoTitolo.innerText = "Benvenuto su Cercalo!";
+      if (successoMsg) successoMsg.innerText = "La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici, inviare email agli artigiani e recensire i loro servizi.";
+    } else {
+      // Crea il profilo artigiano/professionista
+      const avatarVal = document.getElementById("reg-avatar").value;
+      const qualificaVal = document.getElementById("reg-qualifica").value.trim() || (ruoloInput === "professionista" ? "Professionista" : "Aiutante");
+      const categoriaVal = document.getElementById("reg-categoria-opt").value;
+      const cittaVal = document.getElementById("reg-citta").value.trim() || "Messina";
+      const telefonoVal = document.getElementById("reg-telefono").value.trim() || "Non fornito";
+      const prezzoVal = document.getElementById("reg-prezzo").value.trim() || "Da concordare";
+      const bioVal = document.getElementById("reg-bio").value.trim() || "Disponibile per la community di Cercalo.";
+      
+      const nuovoArtigiano = {
+        id: Date.now(),
+        nome: nomeInput,
+        ruolo: qualificaVal,
+        citta: cittaVal,
+        biografia: bioVal,
+        cuori: 5.0,
+        recensioniCount: 0,
+        prezzo: prezzoVal,
+        categoria: categoriaVal,
+        tipoHelper: ruoloInput,
+        avatar: avatarVal,
+        facSimile: false,
+        approvato: false, // Richiede approvazione dell'amministratore!
+        promoGratis: true,
+        contatti: {
+          telefono: telefonoVal,
+          email: emailInput
+        },
+        recensioni: []
+      };
+      
+      ARTIGIANI.push(nuovoArtigiano);
+      localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
+      
+      if (successoTitolo) successoTitolo.innerText = "Candidatura Ricevuta!";
+      if (successoMsg) {
+        successoMsg.innerHTML = `
+          Grazie per esserti candidato su Cercalo, <strong>${nomeInput}</strong>!<br><br>
+          Il tuo profilo professionale è stato inviato per l'<strong>approvazione preventiva dell'amministratore</strong>. 
+          Ti contatteremo via email all'indirizzo <em>${emailInput}</em> per definire l'attivazione e concordare il pagamento della quota simbolica annuale (5€/anno, primo anno gratuito).
+        `;
+      }
+    }
+    
+    state.registrazioneStep = 1;
+    
   } else {
-    alert("Registrazione completata con successo! Ora puoi accedere a tutti i contatti degli artigiani e recensire le prestazioni.");
+    // Caso: ACCEDO AD UN ACCOUNT ESISTENTE
+    localStorage.setItem("cercalo_utente_email", emailInput);
+    localStorage.setItem("cercalo_utente_nome", nomeInput);
+    
+    state.utenteRegistrato = true;
+    localStorage.setItem("cercalo_registrato", "true");
+    aggiornaUIRegistrazione();
+    chiudiModalRegistrazione();
+    
+    // Se c'era un artigiano selezionato, aprilo
+    if (state.artigianoSelezionato) {
+      setTimeout(() => {
+        apriModalDettagli(state.artigianoSelezionato);
+      }, 300);
+    } else {
+      alert("Bentornato! Accesso eseguito con successo.");
+    }
   }
 };
 
@@ -620,11 +805,43 @@ window.eliminaAccount = () => {
 
 // Gestione Categoria Cliccata
 window.selezionaCategoria = (cat, element) => {
+  // Disattiva il filtro preferiti quando si seleziona una categoria
+  state.soloPreferiti = false;
+
   if (state.categoriaAttiva === cat) {
     state.categoriaAttiva = "";
   } else {
     state.categoriaAttiva = cat;
   }
+
+  renderCategorieRapide();
+  renderArtigiani();
+};
+
+// Attiva/Disattiva Filtro Preferiti
+window.toggleFiltroPreferiti = (element) => {
+  state.categoriaAttiva = "";
+  state.soloPreferiti = !state.soloPreferiti;
+
+  renderCategorieRapide();
+  renderArtigiani();
+};
+
+// Aggiungi / Rimuovi dai Preferiti
+window.togglePreferito = (id, event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation(); // Previene l'apertura del modal dettagli artigiano
+  }
+
+  const index = state.preferiti.indexOf(id);
+  if (index === -1) {
+    state.preferiti.push(id);
+  } else {
+    state.preferiti.splice(index, 1);
+  }
+
+  localStorage.setItem("cercalo_preferiti", JSON.stringify(state.preferiti));
 
   renderCategorieRapide();
   renderArtigiani();

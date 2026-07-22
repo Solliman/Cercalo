@@ -7,7 +7,7 @@
   <title>Cercalo - Troviamo chi ti aiuta con il cuore</title>
   <link rel="icon" type="image/png" href="Loghi/logo_terracotta_scontornato.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="index.css?v=7.0">
+  <link rel="stylesheet" href="index.css?v=8.0">
 </head>
 <body>
 
@@ -209,10 +209,80 @@
           </div>
         </div>
 
+        <!-- Form Candidatura Lavoratore (Step 2) -->
+        <div id="form-registrati-artigiano" style="display: none; flex-direction: column; gap: 16px; margin-top: 16px;">
+          <div style="font-size: 13px; color: var(--primary-pesca); font-weight: 700; margin-bottom: 4px; border-bottom: 1px solid rgba(200, 106, 81, 0.12); padding-bottom: 8px;">
+            COMPLETA IL TUO PROFILO PUBBLICO (Approvazione Preventiva)
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-avatar">Seleziona il tuo Simbolo / Emoji</label>
+            <select id="reg-avatar" class="form-input">
+              <option value="👨‍🔧">👨‍🔧 Tuttofare</option>
+              <option value="🔧">🔧 Idraulico</option>
+              <option value="⚡">⚡ Elettricista</option>
+              <option value="💇‍♀️">💇‍♀️ Estetista / Parrucchiera</option>
+              <option value="👩‍⚕️">👩‍⚕️ Assistenza / Compagnia</option>
+              <option value="🪵">🪵 Falegname / Artigiano</option>
+              <option value="🎨">🎨 Artista / Decoratore</option>
+              <option value="🧹">🧹 Pulizie</option>
+              <option value="🧑‍🍳">🧑‍🍳 Cuoco / Ristorazione</option>
+              <option value="🧑‍🌾">🧑‍🌾 Giardiniere / Agricoltura</option>
+              <option value="📐">📐 Progettista / Geometra</option>
+              <option value="🚗">🚗 Trasporti / Autista</option>
+              <option value="💻">💻 Assistenza PC / Tech</option>
+              <option value="🌸">🌸 Altro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-qualifica">Qualifica / Ruolo Specifico</label>
+            <input type="text" id="reg-qualifica" class="form-input" placeholder="Es. Tuttofare Gentile, Idraulico Rapido, Assistente Anziani">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-categoria-opt">Categoria Principale</label>
+            <select id="reg-categoria-opt" class="form-input">
+              <option value="tuttofare">Tuttofare</option>
+              <option value="idraulico">Idraulico</option>
+              <option value="elettricista">Elettricista</option>
+              <option value="estetista">Estetista</option>
+              <option value="assistenza">Assistenza / Cura Persona</option>
+              <option value="artigianato">Artigianato / Falegname</option>
+              <option value="artista">Artista / Decoratore</option>
+              <option value="altro">Altro (specificato sotto)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-citta">Città Operativa</label>
+            <input type="text" id="reg-citta" class="form-input" placeholder="Es. Milano, Roma, Messina">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-telefono">Numero di Telefono (Sbloccato solo dopo iscrizione)</label>
+            <input type="text" id="reg-telefono" class="form-input" placeholder="Es. 333 1234567">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-prezzo">Tariffa di Riferimento / Compensi</label>
+            <input type="text" id="reg-prezzo" class="form-input" placeholder="Es. Offerta Libera, €30 chiamata + preventivo">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-bio">Biografia / Chi sei e come offri aiuto con il cuore</label>
+            <textarea id="reg-bio" class="form-input" rows="3" placeholder="Scrivi una breve biografia per farti conoscere..."></textarea>
+          </div>
+        </div>
+
         <button type="submit" id="submit-modal-btn" class="btn-cerca" style="width: 100%; margin-top: 10px;">
           Registrati e Sblocca i Contatti
         </button>
       </form>
+
+      <!-- Box successo candidatura / registrazione -->
+      <div id="auth-successo-box" style="display: none; text-align: center; padding: 20px 10px;">
+        <span style="font-size: 48px; display: block; margin-bottom: 16px;">🎉</span>
+        <h3 id="successo-titolo" style="font-family: var(--font-titoli); font-size: 20px; color: var(--color-testo); margin-bottom: 8px;">Benvenuto su Cercalo!</h3>
+        <p id="successo-msg" style="font-size: 14px; line-height: 1.6; color: var(--color-testo-mutato); margin-bottom: 20px;">
+          La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici e le email degli artigiani e recensire i loro servizi.
+        </p>
+        <button class="btn-cerca" onclick="chiudiModalRegistrazione(); location.reload();" style="width: 100%;">Accedi Subito</button>
+      </div>
+
     </div>
   </div>
 
@@ -297,6 +367,6 @@
     </div>
   </div>
 
-  <script src="index.js?v=7.0"></script>
+  <script src="index.js?v=8.0"></script>
 </body>
 </html>
