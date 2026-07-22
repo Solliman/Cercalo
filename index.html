@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.qrserver.com; connect-src 'self';">
   <title>Cercalo - Troviamo chi ti aiuta con il cuore</title>
   <link rel="icon" type="image/png" href="Loghi/logo_terracotta_scontornato.png">
   <link rel="manifest" href="manifest.json">
@@ -330,15 +330,24 @@
       </div>
 
       <!-- Contatti Sbloccati -->
-      <div class="modal-det-contatti">
-        <h4 style="font-family: var(--font-titoli); font-size: 16px; margin-bottom: 12px; color: var(--accent-salvia-dark);">Contatta questa persona:</h4>
-        <div class="contatto-item">
-          <span class="contatto-icon">📞</span>
-          <span>Telefono: <a id="det-tel" class="contatto-link" href="tel:+39">Chiama</a></span>
-        </div>
-        <div class="contatto-item">
-          <span class="contatto-icon">✉️</span>
-          <span>Email: <a id="det-email" class="contatto-link" href="mailto:">Invia Email</a></span>
+      <div class="modal-det-contatti" style="display: flex; flex-direction: column; gap: 12px;">
+        <h4 style="font-family: var(--font-titoli); font-size: 16px; margin-bottom: 4px; color: var(--accent-salvia-dark);">Contatta questa persona:</h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between;">
+          <div style="flex: 1; min-width: 180px;">
+            <div class="contatto-item" style="margin-bottom: 8px;">
+              <span class="contatto-icon">📞</span>
+              <span>Telefono: <a id="det-tel" class="contatto-link" href="tel:+39">Chiama</a></span>
+            </div>
+            <div class="contatto-item">
+              <span class="contatto-icon">✉️</span>
+              <span>Email: <a id="det-email" class="contatto-link" href="mailto:">Invia Email</a></span>
+            </div>
+          </div>
+          <!-- QR Code di Conferma Lavoro -->
+          <div style="text-align: center; border-left: 1px solid #ECEAE6; padding-left: 20px; display: flex; flex-direction: column; align-items: center;" id="det-qrcode-container">
+            <p style="font-size: 9px; font-weight: 700; color: var(--color-testo-mutato); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase;">QR Code Conferma Lavoro</p>
+            <img id="det-qrcode-img" src="" alt="QR Code Lavoro" style="width: 80px; height: 80px; display: block; border: 1px solid #ECEAE6; padding: 4px; border-radius: 8px; background: white;">
+          </div>
         </div>
       </div>
 
@@ -355,19 +364,60 @@
 
   <!-- MODAL 3: Gestione Profilo Attivo -->
   <div id="modal-profilo" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px;">
+    <div class="modal-box" style="max-width: 500px; width: 90%;">
       <button class="modal-close">✕</button>
       <div class="modal-header">
         <h2 class="modal-titolo">Il Tuo Profilo</h2>
         <p class="modal-sottotitolo">Sei registrato nella community di Cercalo.</p>
       </div>
-      <div style="text-align: center; margin: 24px 0;">
-        <span style="font-size: 48px;">✨</span>
+      <div style="text-align: center; margin: 20px 0; padding-bottom: 15px; border-bottom: 1px solid #ECEAE6;">
+        <span style="font-size: 40px;">✨</span>
         <p style="font-weight: 700; margin-top: 10px; font-size: 18px;" id="profilo-nome-visualizzato">Utente Attivo</p>
         <p style="font-size: 13px; color: var(--color-testo-mutato); margin-top: 4px;" id="profilo-email-visualizzato">email@esempio.it</p>
       </div>
-      <button class="btn-cerca" style="width: 100%; background-color: var(--color-testo-mutato); color: white; margin-bottom: 12px; border: none; padding: 12px; border-radius: 12px; font-weight: 700;" onclick="eseguiLogout()">Disconnetti (Logout)</button>
-      <button class="btn-delete" style="width: 100%; border-radius: 12px; padding: 12px; font-weight: 700; background-color: #FCEFF0; color: #E56B6F; border: none; cursor: pointer;" onclick="eliminaAccount()">Elimina Account</button>
+
+      <!-- Sezione Contatti Recenti e Feedback -->
+      <div style="margin-bottom: 20px;">
+        <h4 style="font-family: var(--font-titoli); font-size: 15px; color: var(--primary-pesca-dark); margin-bottom: 10px;">👤 Contatti Sbloccati & Lavori</h4>
+        <div id="profilo-sblocchi-lista" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
+          <!-- Popolato Dinamicamente -->
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cerca" style="flex: 1; background-color: var(--color-testo-mutato); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px;" onclick="eseguiLogout()">Logout</button>
+        <button style="flex: 1; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 13px; background-color: #FCEFF0; color: #E56B6F; border: none; cursor: pointer;" onclick="eliminaAccount()">Elimina Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Lascia Recensione del Cuore (Verificata) -->
+  <div id="modal-recensione" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; width: 90%;">
+      <button class="modal-close" onclick="chiudiModalRecensione()">✕</button>
+      <div class="modal-header">
+        <h2 class="modal-titolo" id="recensione-modal-titolo">Valuta con il Cuore</h2>
+        <p class="modal-sottotitolo">Condividi la tua esperienza per aiutare la community.</p>
+      </div>
+      <form id="form-lascia-recensione" class="modal-form" onsubmit="inviaRecensione(event)">
+        <input type="hidden" id="rec-artigiano-id">
+        <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+          <label class="form-label" style="font-weight: 700; display: block; margin-bottom: 10px;">Quanti cuori assegni? *</label>
+          <div style="font-size: 32px; cursor: pointer; display: inline-flex; gap: 8px; justify-content: center;" id="rec-stars-container">
+            <span class="rec-star attiva" onclick="impostaCuoriRecensione(1)">❤️</span>
+            <span class="rec-star attiva" onclick="impostaCuoriRecensione(2)">❤️</span>
+            <span class="rec-star attiva" onclick="impostaCuoriRecensione(3)">❤️</span>
+            <span class="rec-star attiva" onclick="impostaCuoriRecensione(4)">❤️</span>
+            <span class="rec-star attiva" onclick="impostaCuoriRecensione(5)">❤️</span>
+          </div>
+          <input type="hidden" id="rec-voto-cuori" value="5" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="rec-commento">La tua Recensione del Cuore *</label>
+          <textarea id="rec-commento" class="form-input" rows="4" placeholder="Es. Persona squisita, pulita e onestissima..." required></textarea>
+        </div>
+        <button type="submit" class="btn-cerca" style="width: 100%; margin-top: 10px;">Invia Recensione e Conferma Lavoro</button>
+      </form>
     </div>
   </div>
 

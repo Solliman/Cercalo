@@ -191,18 +191,46 @@ let ARTIGIANI = [];
 // Inizializza il database da localStorage
 const inizializzaDatabase = () => {
   const dbLocale = localStorage.getItem("cercalo_database");
+  const unAnnoDaOggi = () => {
+    const data = new Date();
+    data.setFullYear(data.getFullYear() + 1);
+    return data.toISOString().split('T')[0];
+  };
+
   if (dbLocale) {
     try {
       ARTIGIANI = JSON.parse(dbLocale);
-      // Allineamento/Migrazione dei profili demo esistenti per supportare Fac-Simile ed iniziali puntate
+      // Allineamento/Migrazione dei profili esistenti per supportare abbonamenti e lavori
       let modificato = false;
       ARTIGIANI = ARTIGIANI.map(a => {
+        if (a.pagato === undefined) {
+          a.pagato = true;
+          modificato = true;
+        }
+        if (a.scadenzaAbbonamento === undefined) {
+          a.scadenzaAbbonamento = unAnnoDaOggi();
+          modificato = true;
+        }
+        if (a.lavoriRicevuti === undefined) {
+          a.lavoriRicevuti = a.recensioniCount || 0;
+          modificato = true;
+        }
+        if (a.sblocchiContatti === undefined) {
+          a.sblocchiContatti = [];
+          modificato = true;
+        }
+
         const mockEquiv = ARTIGIANI_MOCK.find(m => m.id === a.id);
         if (mockEquiv) {
           // Se ha ancora il nome vecchio (es. Rossi) o manca la flag facsimile
           if (a.nome !== mockEquiv.nome || a.facSimile !== mockEquiv.facSimile) {
             modificato = true;
-            return { ...a, nome: mockEquiv.nome, facSimile: mockEquiv.facSimile, approvato: mockEquiv.approvato };
+            return { 
+              ...a, 
+              nome: mockEquiv.nome, 
+              facSimile: mockEquiv.facSimile, 
+              approvato: mockEquiv.approvato !== undefined ? mockEquiv.approvato : true 
+            };
           }
         }
         return a;
@@ -212,11 +240,25 @@ const inizializzaDatabase = () => {
       }
     } catch (e) {
       console.error("Errore nel parsing del database locale, ripristino mock", e);
-      ARTIGIANI = ARTIGIANI_MOCK.map(a => ({ ...a, approvato: true }));
+      ARTIGIANI = ARTIGIANI_MOCK.map(a => ({ 
+        ...a, 
+        approvato: true,
+        pagato: true,
+        scadenzaAbbonamento: unAnnoDaOggi(),
+        lavoriRicevuti: a.recensioniCount || 0,
+        sblocchiContatti: []
+      }));
       localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
     }
   } else {
-    ARTIGIANI = ARTIGIANI_MOCK.map(a => ({ ...a, approvato: true }));
+    ARTIGIANI = ARTIGIANI_MOCK.map(a => ({ 
+      ...a, 
+      approvato: true,
+      pagato: true,
+      scadenzaAbbonamento: unAnnoDaOggi(),
+      lavoriRicevuti: a.recensioniCount || 0,
+      sblocchiContatti: []
+    }));
     localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
   }
 };
@@ -350,6 +392,14 @@ const renderArtigiani = () => {
   const risultati = ARTIGIANI.filter(art => {
     // Escludi i profili non approvati
     if (art.approvato === false) return false;
+
+    // Escludi i profili con abbonamento scaduto
+    if (art.scadenzaAbbonamento) {
+      const oggiStr = new Date().toISOString().split('T')[0];
+      if (art.scadenzaAbbonamento < oggiStr) {
+        return false;
+      }
+    }
 
     // Applica filtro preferiti
     if (state.soloPreferiti && !state.preferiti.includes(art.id)) return false;
@@ -548,6 +598,18 @@ const apriModalDettagli = (art) => {
   const modal = document.getElementById("modal-dettagli");
   if (!modal) return;
 
+  // Tracciamento sblocchi contatti (se l'utente loggato visualizza questa scheda)
+  if (state.utenteRegistrato) {
+    const emailUtente = localStorage.getItem("cercalo_utente_email");
+    if (emailUtente) {
+      if (!art.sblocchiContatti) art.sblocchiContatti = [];
+      if (!art.sblocchiContatti.includes(emailUtente)) {
+        art.sblocchiContatti.push(emailUtente);
+        localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
+      }
+    }
+  }
+
   // Compila i dati dell'artigiano
   document.getElementById("det-avatar").innerText = art.avatar;
   document.getElementById("det-nome").innerText = art.nome;
@@ -555,7 +617,7 @@ const apriModalDettagli = (art) => {
   document.getElementById("det-citta").innerText = `📍 Opera a ${art.citta}`;
   document.getElementById("det-bio").innerText = art.biografia;
   document.getElementById("det-prezzo").innerText = art.prezzo;
-  document.getElementById("det-valutazione").innerText = `❤️ ${art.cuori.toFixed(1)} / 5 (${art.recensioniCount} pareri del cuore)`;
+  document.getElementById("det-valutazione").innerHTML = `❤️ ${art.cuori.toFixed(1)} / 5 (${art.recensioniCount} pareri del cuore)<br><span style="font-size: 13px; color: var(--accent-salvia-dark); font-weight: 600; display: block; margin-top: 5px;">💼 Lavori completati con Cercalo: <strong>${art.lavoriRicevuti || 0}</strong></span>`;
 
   // Contatti
   document.getElementById("det-tel").innerText = art.contatti.telefono;
@@ -571,6 +633,13 @@ const apriModalDettagli = (art) => {
     } else {
       if (emailItem) emailItem.style.display = "none";
     }
+  }
+
+  // Genera QR Code Lavoro
+  const qrImg = document.getElementById("det-qrcode-img");
+  if (qrImg) {
+    const confermaUrl = window.location.origin + window.location.pathname + "?conferma-lavoro=" + art.id;
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(confermaUrl)}`;
   }
 
   // Recensioni
@@ -626,7 +695,13 @@ window.inviaFormLogin = (e) => {
   aggiornaUIRegistrazione();
   chiudiModalRegistrazione();
   
-  if (state.artigianoSelezionato) {
+  const pendingRecId = localStorage.getItem("cercalo_pending_conferma_lavoro");
+  if (pendingRecId) {
+    localStorage.removeItem("cercalo_pending_conferma_lavoro");
+    setTimeout(() => {
+      apriModalRecensione(pendingRecId);
+    }, 500);
+  } else if (state.artigianoSelezionato) {
     setTimeout(() => {
       apriModalDettagli(state.artigianoSelezionato);
     }, 300);
@@ -649,12 +724,21 @@ window.inviaFormRegistrazioneCercatore = (e) => {
   localStorage.setItem("cercalo_registrato", "true");
   aggiornaUIRegistrazione();
   
-  const successoTitolo = document.getElementById("successo-titolo-nuovo");
-  const successoMsg = document.getElementById("successo-msg-nuovo");
-  if (successoTitolo) successoTitolo.innerText = "Benvenuto su Cercalo!";
-  if (successoMsg) successoMsg.innerText = "La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici e le email degli artigiani e recensire i loro servizi.";
-  
-  mostraSottoSezioneAuth('successo');
+  const pendingRecId = localStorage.getItem("cercalo_pending_conferma_lavoro");
+  if (pendingRecId) {
+    localStorage.removeItem("cercalo_pending_conferma_lavoro");
+    chiudiModalRegistrazione();
+    setTimeout(() => {
+      apriModalRecensione(pendingRecId);
+    }, 500);
+  } else {
+    const successoTitolo = document.getElementById("successo-titolo-nuovo");
+    const successoMsg = document.getElementById("successo-msg-nuovo");
+    if (successoTitolo) successoTitolo.innerText = "Benvenuto su Cercalo!";
+    if (successoMsg) successoMsg.innerText = "La tua registrazione come cercatore è andata a buon fine. Ora puoi vedere i recapiti telefonici e le email degli artigiani e recensire i loro servizi.";
+    
+    mostraSottoSezioneAuth('successo');
+  }
 };
 
 // Gestione invio form CANDIDATURA LAVORATORE STEP 1
@@ -760,6 +844,9 @@ const apriModalProfilo = () => {
   document.getElementById("profilo-nome-visualizzato").innerText = nome;
   document.getElementById("profilo-email-visualizzato").innerText = email;
   
+  // Popola la lista dei contatti sbloccati per recensione verificate
+  popolaSblocchiProfilo();
+  
   modal.classList.add("attivo");
 };
 
@@ -768,6 +855,130 @@ const chiudiModalProfilo = () => {
   if (modal) {
     modal.classList.remove("attivo");
   }
+};
+
+const popolaSblocchiProfilo = () => {
+  const lista = document.getElementById("profilo-sblocchi-lista");
+  if (!lista) return;
+  
+  const emailUtente = localStorage.getItem("cercalo_utente_email");
+  if (!emailUtente) {
+    lista.innerHTML = `<p style="font-size: 13px; text-align: center; color: var(--color-testo-mutato);">Effettua l'accesso per vedere la cronologia.</p>`;
+    return;
+  }
+  
+  // Trova gli artigiani sbloccati
+  const artigianiContattati = ARTIGIANI.filter(art => {
+    return art.sblocchiContatti && art.sblocchiContatti.includes(emailUtente);
+  });
+  
+  if (artigianiContattati.length === 0) {
+    lista.innerHTML = `<p style="font-size: 13px; text-align: center; color: var(--color-testo-mutato); padding: 15px 0;">Non hai ancora sbloccato contatti di artigiani.</p>`;
+    return;
+  }
+  
+  lista.innerHTML = artigianiContattati.map(art => {
+    // Controlla se l'utente ha già recensito questo artigiano
+    const haGiaRecensito = art.recensioni && art.recensioni.some(r => r.utente === (localStorage.getItem("cercalo_utente_nome") || "Cercatore"));
+    
+    return `
+      <div class="worker-item" style="display: flex; justify-content: space-between; align-items: center; background-color: #FAF9F6; padding: 10px; border-radius: 12px; border: 1px solid #ECEAE6; margin-bottom: 5px; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 24px;">${art.avatar || '👨‍🔧'}</span>
+          <div>
+            <div style="font-weight: 700; font-size: 13px; color: var(--color-testo);">${art.nome}</div>
+            <div style="font-size: 11px; color: var(--color-testo-mutato);">${art.ruolo}</div>
+          </div>
+        </div>
+        <div>
+          ${haGiaRecensito 
+            ? `<span style="font-size: 11px; color: #2E7559; font-weight: 600; padding: 4px 8px; background: rgba(46, 117, 89, 0.08); border-radius: 12px;">✓ Lavoro Confermato</span>`
+            : `<button class="btn-ritorna" style="font-size: 11px; padding: 6px 10px; border: 1px solid var(--primary-pesca); color: var(--primary-pesca); background: transparent; cursor: pointer; border-radius: 12px;" onclick="chiudiModalProfilo(); apriModalRecensione(${art.id})">Conferma Lavoro</button>`
+          }
+        </div>
+      </div>
+    `;
+  }).join("");
+};
+
+window.apriModalRecensione = (id) => {
+  const art = ARTIGIANI.find(a => a.id === parseInt(id));
+  if (!art) return;
+  
+  const modal = document.getElementById("modal-recensione");
+  if (!modal) return;
+  
+  document.getElementById("recensione-modal-titolo").innerText = "Valuta con il Cuore: " + art.nome;
+  document.getElementById("rec-artigiano-id").value = art.id;
+  document.getElementById("rec-commento").value = "";
+  
+  impostaCuoriRecensione(5);
+  
+  modal.classList.add("attivo");
+};
+
+window.chiudiModalRecensione = () => {
+  const modal = document.getElementById("modal-recensione");
+  if (modal) {
+    modal.classList.remove("attivo");
+  }
+};
+
+window.impostaCuoriRecensione = (voto) => {
+  document.getElementById("rec-voto-cuori").value = voto;
+  const stars = document.querySelectorAll("#rec-stars-container .rec-star");
+  stars.forEach((star, index) => {
+    if (index < voto) {
+      star.classList.add("attiva");
+    } else {
+      star.classList.remove("attiva");
+    }
+  });
+};
+
+window.inviaRecensione = (e) => {
+  e.preventDefault();
+  
+  const artId = parseInt(document.getElementById("rec-artigiano-id").value);
+  const voto = parseInt(document.getElementById("rec-voto-cuori").value);
+  const commento = document.getElementById("rec-commento").value.trim();
+  
+  const art = ARTIGIANI.find(a => a.id === artId);
+  if (!art) return;
+  
+  const nomeUtente = localStorage.getItem("cercalo_utente_nome") || "Cercatore";
+  const dataOggi = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+  
+  const nuovaRec = {
+    utente: nomeUtente,
+    data: dataOggi,
+    cuori: voto,
+    testo: commento
+  };
+  
+  if (!art.recensioni) art.recensioni = [];
+  art.recensioni.push(nuovaRec);
+  
+  // Incrementa lavori completati
+  art.lavoriRicevuti = (art.lavoriRicevuti || 0) + 1;
+  
+  // Ricalcola media rating
+  const sommaCuori = art.recensioni.reduce((sum, r) => sum + r.cuori, 0);
+  art.cuori = sommaCuori / art.recensioni.length;
+  art.recensioniCount = art.recensioni.length;
+  
+  localStorage.setItem("cercalo_database", JSON.stringify(ARTIGIANI));
+  
+  chiudiModalRecensione();
+  renderArtigiani();
+  
+  // Se il modale dettagli è aperto, aggiornalo
+  const detModal = document.getElementById("modal-dettagli");
+  if (detModal && detModal.classList.contains("attivo") && state.artigianoSelezionato && state.artigianoSelezionato.id === artId) {
+    apriModalDettagli(art);
+  }
+  
+  alert("Grazie! Il tuo feedback è stato salvato e il lavoro è stato confermato con successo.");
 };
 
 window.eseguiLogout = () => {
@@ -892,6 +1103,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+  // Controllo se c'è una richiesta di conferma lavoro da QR Code nell'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const confermaLavoroId = urlParams.get("conferma-lavoro");
+  if (confermaLavoroId) {
+    if (state.utenteRegistrato) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setTimeout(() => {
+        apriModalRecensione(confermaLavoroId);
+      }, 500);
+    } else {
+      localStorage.setItem("cercalo_pending_conferma_lavoro", confermaLavoroId);
+      alert("Per confermare il lavoro e lasciare una recensione, effettua prima l'accesso o registrati gratuitamente.");
+      setTimeout(() => {
+        apriModalLogin();
+      }, 500);
+    }
+  }
+
   // Overlay Click chiude i modal
   const overlays = document.querySelectorAll(".modal-overlay");
   overlays.forEach(overlay => {
@@ -900,6 +1129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chiudiModalRegistrazione();
         chiudiModalDettagli();
         chiudiModalProfilo();
+        chiudiModalRecensione();
         chiudiLightbox();
       }
     });
@@ -912,6 +1142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       chiudiModalRegistrazione();
       chiudiModalDettagli();
       chiudiModalProfilo();
+      chiudiModalRecensione();
       chiudiLightbox();
     });
   });

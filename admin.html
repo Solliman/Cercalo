@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.qrserver.com; connect-src 'self';">
   <title>Area Amministratore - Cercalo</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="index.css?v=11.0">
@@ -297,6 +297,88 @@
       margin-bottom: 10px;
       color: var(--primary-pesca);
     }
+
+    /* Stili per Tabella Scadenze, Filtri e Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-badge.regola {
+      background-color: rgba(46, 117, 89, 0.1);
+      color: #2E7559;
+    }
+    .status-badge.scadenza {
+      background-color: rgba(220, 160, 50, 0.15);
+      color: #b06000;
+    }
+    .status-badge.scaduto {
+      background-color: rgba(229, 107, 111, 0.1);
+      color: #E56B6F;
+    }
+    .status-badge.paid {
+      background-color: rgba(46, 117, 89, 0.08);
+      color: #2E7559;
+    }
+    .status-badge.unpaid {
+      background-color: rgba(229, 107, 111, 0.08);
+      color: #E56B6F;
+    }
+    .status-badge.active {
+      background-color: #e8f0fe;
+      color: #1a73e8;
+    }
+    .status-badge.pending {
+      background-color: #fff4e5;
+      color: #b06000;
+    }
+    .tab-btn-scadenza {
+      background-color: #FAF9F6;
+      border: 1px solid #ECEAE6;
+      color: var(--color-testo-mutato);
+      padding: 6px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: var(--transition-veloce);
+    }
+    .tab-btn-scadenza.attivo, .tab-btn-scadenza:hover {
+      background-color: var(--primary-pesca);
+      color: white;
+      border-color: var(--primary-pesca);
+    }
+    .btn-action-small {
+      font-size: 10px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid;
+      cursor: pointer;
+      font-weight: 700;
+      background: white;
+      transition: var(--transition-veloce);
+      margin-left: 4px;
+    }
+    .btn-action-small.pay {
+      border-color: #2E7559;
+      color: #2E7559;
+    }
+    .btn-action-small.pay:hover {
+      background-color: #2E7559;
+      color: white;
+    }
+    .btn-action-small.remind {
+      border-color: var(--primary-pesca);
+      color: var(--primary-pesca);
+    }
+    .btn-action-small.remind:hover {
+      background-color: var(--primary-pesca);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -429,6 +511,30 @@
             <label for="w-promo">🎁 <strong>Regala 1 Anno Gratis</strong> (Promo di lancio)</label>
           </div>
 
+          <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; margin-bottom: 15px; padding: 12px; background-color: rgba(200, 106, 81, 0.05); border-radius: 8px;">
+            <div class="form-group">
+              <label for="w-approvato">Stato Profilo</label>
+              <select id="w-approvato" class="form-control">
+                <option value="attivo">Attivo (Approvato ed in bacheca)</option>
+                <option value="sospeso">Sospeso (In attesa / Non visibile)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="w-pagato">Stato Pagamento</label>
+              <select id="w-pagato" class="form-control">
+                <option value="pagato">Pagato (Quota annuale versata)</option>
+                <option value="non_pagato">Da Pagare (Sospeso / In attesa)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2; margin-bottom: 0;">
+              <label for="w-scadenza">Data Scadenza Abbonamento</label>
+              <input type="date" id="w-scadenza" class="form-control">
+              <span style="font-size: 10px; color: var(--color-testo-mutato); display: block; margin-top: 4px;">Se lasciato vuoto, verrà impostato automaticamente a 1 anno da oggi.</span>
+            </div>
+          </div>
+
           <div style="display: flex; gap: 10px;">
             <button type="submit" id="btn-submit-form" class="btn-submit">Aggrega Lavoratore al Database</button>
             <button type="button" id="btn-cancel-edit" class="btn-submit" style="background-color: var(--color-testo-mutato); display: none; width: auto; padding: 14px 20px;">Annulla</button>
@@ -449,6 +555,37 @@
         </div>
 
         <button id="btn-reset-db" class="btn-reset">⚠️ Ripristina profili demo iniziali</button>
+      </div>
+    </div>
+
+    <!-- Sezione Dashboard Scadenze e Abbonamenti -->
+    <div class="admin-card" style="margin-top: 30px;">
+      <h2 class="admin-card-title" style="color: var(--primary-pesca);">💰 Gestione Abbonamenti e Scadenze</h2>
+      <p style="font-size: 14px; margin-bottom: 20px; color: var(--color-testo-mutato);">Riepilogo e controllo delle quote mutualistiche di 5€/anno per tutti i professionisti registrati.</p>
+      
+      <div class="tab-selector" style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+        <button class="tab-btn-scadenza attivo" id="tab-scad-tutti" onclick="filtraScadenze('tutti')">Tutti</button>
+        <button class="tab-btn-scadenza" id="tab-scad-regola" onclick="filtraScadenze('regola')">In Regola</button>
+        <button class="tab-btn-scadenza" id="tab-scad-scadenza" onclick="filtraScadenze('scadenza')">In Scadenza (≤ 30gg)</button>
+        <button class="tab-btn-scadenza" id="tab-scad-scaduti" onclick="filtraScadenze('scaduti')">Scaduti</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 700px;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--primary-pesca-chiaro); padding-bottom: 8px; color: var(--primary-pesca-dark);">
+              <th style="padding: 10px;">Lavoratore</th>
+              <th style="padding: 10px;">Stato Profilo</th>
+              <th style="padding: 10px;">Stato Pagamento</th>
+              <th style="padding: 10px;">Scadenza</th>
+              <th style="padding: 10px;">Giorni Rimanenti</th>
+              <th style="padding: 10px; text-align: right;">Azioni di Rinnovo / Promemoria</th>
+            </tr>
+          </thead>
+          <tbody id="scadenze-tbody">
+            <!-- Popolato Dinamicamente -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -511,7 +648,7 @@
                 </div>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button class="btn-ritorna" style="font-size: 11px; padding: 4px 10px; border-color: var(--accent-salvia); color: var(--accent-salvia-dark); background-color: transparent;" onclick="approvaArtigiano(${art.id})">Approva</button>
+                <button class="btn-ritorna" style="font-size: 11px; padding: 4px 10px; border-color: var(--primary-pesca); color: var(--primary-pesca); background-color: transparent;" onclick="modificaArtigiano(${art.id})">Esamina / Modifica</button>
                 <button class="btn-delete" onclick="eliminaArtigiano(${art.id})" title="Rifiuta Profilo">✕</button>
               </div>
             </div>
@@ -552,6 +689,9 @@
           `;
         }).join("");
       }
+
+      // Renderizza la dashboard abbonamenti e scadenze
+      renderScadenzeDashboard();
     };
 
     // Approva
@@ -600,6 +740,11 @@
       document.getElementById("w-email").value = art.contatti.email || "";
       document.getElementById("w-promo").checked = !!art.promoGratis;
       
+      // Nuovi campi per abbonamenti e scadenze
+      document.getElementById("w-approvato").value = art.approvato !== false ? "attivo" : "sospeso";
+      document.getElementById("w-pagato").value = art.pagato !== false ? "pagato" : "non_pagato";
+      document.getElementById("w-scadenza").value = art.scadenzaAbbonamento || "";
+      
       // Aggiorna pulsanti
       document.getElementById("btn-submit-form").innerText = "Salva Modifiche Profilo";
       document.getElementById("btn-cancel-edit").style.display = "block";
@@ -613,6 +758,9 @@
       editingId = null;
       document.getElementById("form-add-worker").reset();
       document.getElementById("w-categoria-custom-container").style.display = "none";
+      document.getElementById("w-scadenza").value = "";
+      document.getElementById("w-approvato").value = "attivo";
+      document.getElementById("w-pagato").value = "pagato";
       document.getElementById("btn-submit-form").innerText = "Aggrega Lavoratore al Database";
       document.getElementById("btn-cancel-edit").style.display = "none";
     });
@@ -651,8 +799,6 @@
         input.value = "";
       }
     });
-
-    // Inserimento / Modifica
     document.getElementById("form-add-worker").addEventListener("submit", (e) => {
       e.preventDefault();
       
@@ -670,6 +816,15 @@
       let catValue = document.getElementById("w-categoria").value;
       if (catValue === "altro") {
         catValue = document.getElementById("w-categoria-custom").value.toLowerCase().trim();
+      }
+
+      const approvatoVal = document.getElementById("w-approvato").value === "attivo";
+      const pagatoVal = document.getElementById("w-pagato").value === "pagato";
+      let scadenzaVal = document.getElementById("w-scadenza").value;
+      if (!scadenzaVal) {
+        const data = new Date();
+        data.setFullYear(data.getFullYear() + 1);
+        scadenzaVal = data.toISOString().split('T')[0];
       }
       
       if (editingId !== null) {
@@ -690,6 +845,16 @@
             email: document.getElementById("w-email").value || ""
           };
           
+          art.approvato = approvatoVal;
+          art.pagato = pagatoVal;
+          art.scadenzaAbbonamento = scadenzaVal;
+          if (art.lavoriRicevuti === undefined) {
+            art.lavoriRicevuti = art.recensioniCount || 0;
+          }
+          if (art.sblocchiContatti === undefined) {
+            art.sblocchiContatti = [];
+          }
+          
           salvaDatabase();
           alert("Profilo aggiornato con successo!");
           
@@ -702,7 +867,7 @@
         // INSERIMENTO NUOVO
         const nuovoId = ARTIGIANI.length > 0 ? Math.max(...ARTIGIANI.map(a => a.id)) + 1 : 1;
         const nuovo = {
-          id: nuevoId,
+          id: nuovoId,
           nome: nomeInput,
           ruolo: document.getElementById("w-ruolo").value,
           avatar: document.getElementById("w-avatar").value,
@@ -713,7 +878,11 @@
           biografia: document.getElementById("w-biografia").value,
           cuori: 5.0,
           recensioniCount: 0,
-          approvato: true, // Profilo inserito dall'amministratore è approvato di default
+          lavoriRicevuti: 0,
+          sblocchiContatti: [],
+          approvato: approvatoVal,
+          pagato: pagatoVal,
+          scadenzaAbbonamento: scadenzaVal,
           promoGratis: document.getElementById("w-promo").checked,
           contatti: {
             telefono: document.getElementById("w-tel").value,
@@ -724,13 +893,167 @@
 
         ARTIGIANI.push(nuovo);
         salvaDatabase();
-        alert("Profilo inserito con successo nel database ed attivo in elenco!");
+        alert("Profilo inserito con successo nel database!");
       }
       
       // Reset form
       document.getElementById("form-add-worker").reset();
       document.getElementById("w-categoria-custom-container").style.display = "none";
+      document.getElementById("w-scadenza").value = "";
+      document.getElementById("w-approvato").value = "attivo";
+      document.getElementById("w-pagato").value = "pagato";
     });
+
+    // Reset Database a Mock Iniziali
+    document.getElementById("btn-reset-db").addEventListener("click", () => {
+      if (confirm("Attenzione: questa azione cancellerà tutti i profili inseriti manualmente e ripristinerà i profili demo originali. Vuoi procedere?")) {
+        localStorage.removeItem("cercalo_database");
+        location.reload();
+      }
+    });
+
+    // --- CODICE CRUSCOTTO ABBONAMENTI & SCADENZE ---
+    let activeScadenzaFiltro = 'tutti';
+
+    window.filtraScadenze = (tipo) => {
+      activeScadenzaFiltro = tipo;
+      
+      // Gestione visuale tab
+      document.querySelectorAll(".tab-btn-scadenza").forEach(btn => {
+        btn.classList.remove("attivo");
+      });
+      document.getElementById(`tab-scad-${tipo}`).classList.add("attivo");
+      
+      renderScadenzeDashboard();
+    };
+
+    window.segnaComePagato = (id) => {
+      const art = ARTIGIANI.find(a => a.id === id);
+      if (!art) return;
+      
+      art.pagato = true;
+      
+      // Calcola nuova scadenza (+1 anno)
+      const dataCorrente = art.scadenzaAbbonamento ? new Date(art.scadenzaAbbonamento) : new Date();
+      const oggi = new Date();
+      
+      // Se era già scaduto, partiamo da oggi, altrimenti estendiamo la data futura
+      const baseData = dataCorrente < oggi ? oggi : dataCorrente;
+      baseData.setFullYear(baseData.getFullYear() + 1);
+      
+      art.scadenzaAbbonamento = baseData.toISOString().split('T')[0];
+      
+      salvaDatabase();
+      alert(`Pagamento registrato con successo! Abbonamento di ${art.nome} rinnovato fino al ${new Date(art.scadenzaAbbonamento).toLocaleDateString('it-IT')}.`);
+    };
+
+    window.inviaEmailPromemoria = (id, giorni) => {
+      const art = ARTIGIANI.find(a => a.id === id);
+      if (!art) return;
+      
+      const email = art.contatti.email || "lavoratore@cercalo.it";
+      const nome = art.nome;
+      const dataScad = art.scadenzaAbbonamento ? new Date(art.scadenzaAbbonamento).toLocaleDateString('it-IT') : "N/D";
+      
+      let oggetto = "";
+      let corpo = "";
+      
+      if (giorni === 30) {
+        oggetto = "Cercalo.app - Rinnovo iscrizione annuale tra 30 giorni";
+        corpo = `Ciao ${nome},\n\nti ricordiamo che la tua iscrizione annuale sulla bacheca di Cercalo.app scadrà il ${dataScad} (tra 30 giorni).\n\nPer continuare a far parte della bacheca e ricevere contatti dai cercatori della tua zona, ti invitiamo a rinnovare la quota simbolica annuale di 5€.\n\nRispondi direttamente a questa email o contattaci per definire i dettagli per il versamento della quota.\n\nUn caro saluto,\nIl Team di Cercalo.app`;
+      } else if (giorni === 15) {
+        oggetto = "Cercalo.app - Promemoria rinnovo iscrizione (scadenza tra 15 giorni)";
+        corpo = `Ciao ${nome},\n\nquesto è un promemoria amichevole per informarti che il tuo abbonamento su Cercalo.app scadrà il ${dataScad} (tra 15 giorni).\n\nNessun rinnovo automatico: per rimanere visibile in bacheca ed essere contattato da chi ha bisogno del tuo aiuto, ti ricordiamo di versare la quota mutualistica di 5€ all'anno.\n\nGrazie per la tua presenza e per il tuo prezioso contributo alla community!\n\nUn caro saluto,\nIl Team di Cercalo.app`;
+      } else if (giorni === 7) {
+        oggetto = "Cercalo.app - IMPORTANTE: Iscrizione in scadenza tra 7 giorni";
+        corpo = `Ciao ${nome},\n\nla tua scheda sulla bacheca di Cercalo.app scadrà tra una settimana, in data ${dataScad}.\n\nSe non provvedi al rinnovo della quota annuale di 5€, il tuo profilo verrà temporaneamente disattivato e non comparirà più nei risultati di ricerca.\n\nRispondi a questa email per concordare il pagamento ed evitare interruzioni di visibilità.\n\nUn abbraccio,\nIl Team di Cercalo.app`;
+      }
+      
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(oggetto)}&body=${encodeURIComponent(corpo)}`;
+    };
+
+    window.renderScadenzeDashboard = () => {
+      const tbody = document.getElementById("scadenze-tbody");
+      if (!tbody) return;
+      
+      const oggi = new Date();
+      oggi.setHours(0, 0, 0, 0);
+      
+      const listaFiltro = ARTIGIANI.filter(art => {
+        const dataScad = art.scadenzaAbbonamento ? new Date(art.scadenzaAbbonamento) : oggi;
+        dataScad.setHours(0, 0, 0, 0);
+        
+        const diffTempo = dataScad - oggi;
+        const diffGiorni = Math.ceil(diffTempo / (1000 * 60 * 60 * 24));
+        
+        art.giorniRimanenti = diffGiorni;
+        
+        if (activeScadenzaFiltro === 'regola') {
+          return diffGiorni > 30 && art.approvato !== false;
+        } else if (activeScadenzaFiltro === 'scadenza') {
+          return diffGiorni <= 30 && diffGiorni >= 0 && art.approvato !== false;
+        } else if (activeScadenzaFiltro === 'scaduti') {
+          return diffGiorni < 0 || art.approvato === false;
+        }
+        return true;
+      });
+      
+      if (listaFiltro.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--color-testo-mutato);">Nessun lavoratore corrispondente al filtro selezionato.</td></tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = listaFiltro.map(art => {
+        const badgeStato = art.approvato !== false
+          ? `<span class="status-badge active">Attivo</span>`
+          : `<span class="status-badge pending">Sospeso</span>`;
+          
+        const badgePagato = art.pagato !== false
+          ? `<span class="status-badge paid">Pagato</span>`
+          : `<span class="status-badge unpaid">Non Pagato</span>`;
+          
+        let badgeScad = "";
+        let giorniTesto = "";
+        if (art.giorniRimanenti < 0) {
+          giorniTesto = `<span style="color: #E56B6F; font-weight: 700;">Scaduto da ${Math.abs(art.giorniRimanenti)} gg</span>`;
+        } else if (art.giorniRimanenti <= 30) {
+          giorniTesto = `<span style="color: #b06000; font-weight: 700;">Scade tra ${art.giorniRimanenti} gg</span>`;
+        } else {
+          giorniTesto = `Scade tra ${art.giorniRimanenti} gg`;
+        }
+        
+        const dataVisualizzata = art.scadenzaAbbonamento 
+          ? new Date(art.scadenzaAbbonamento).toLocaleDateString('it-IT') 
+          : "N/D";
+          
+        return `
+          <tr style="border-bottom: 1px solid #ECEAE6; height: 50px;">
+            <td style="padding: 10px; font-weight: 700; display: flex; align-items: center; gap: 8px; height: 50px;">
+              <span style="font-size: 20px;">${art.avatar || '👨‍🔧'}</span>
+              <div>
+                <div>${art.nome}</div>
+                <div style="font-size: 10px; font-weight: normal; color: var(--color-testo-mutato);">Lavori completati: <strong>${art.lavoriRicevuti || 0}</strong></div>
+              </div>
+            </td>
+            <td style="padding: 10px;">${badgeStato}</td>
+            <td style="padding: 10px;">${badgePagato}</td>
+            <td style="padding: 10px;">${dataVisualizzata}</td>
+            <td style="padding: 10px;">${giorniTesto}</td>
+            <td style="padding: 10px; text-align: right;">
+              <button class="btn-action-small pay" onclick="segnaComePagato(${art.id})">Segna Pagato</button>
+              ${art.giorniRimanenti <= 30 
+                ? `
+                  <button class="btn-action-small remind" onclick="inviaEmailPromemoria(${art.id}, 30)" title="Sollecito 30 giorni">30gg</button>
+                  <button class="btn-action-small remind" onclick="inviaEmailPromemoria(${art.id}, 15)" title="Sollecito 15 giorni">15gg</button>
+                  <button class="btn-action-small remind" onclick="inviaEmailPromemoria(${art.id}, 7)" title="Sollecito urgente 7 giorni">7gg</button>
+                `
+                : ''
+              }
+            </td>
+          </tr>
+        `;
+      }).join("");
+    };
 
     // Reset Database a Mock Iniziali
     document.getElementById("btn-reset-db").addEventListener("click", () => {

@@ -1240,3 +1240,15 @@ body {
 .lightbox-img:hover {
   transform: scale(1.02);
 }
+
+/* Stili per la valutazione stelline/cuoricini nel modale recensioni */
+.rec-star {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.3;
+}
+.rec-star.attiva {
+  opacity: 1;
+}
+.rec-star:hover {
+  transform: scale(1.2);
+}
