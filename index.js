@@ -951,8 +951,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Effetto click con il Cuore ("Puff" animato ad ogni click sullo schermo)
+  // Effetto click con il Cuore ("Puff" animato per i primi 5 click sullo schermo)
+  let clickCuoriCounter = 0;
   const creaEffettoCuore = (e) => {
+    if (clickCuoriCounter >= 5) {
+      document.removeEventListener("click", creaEffettoCuore);
+      return;
+    }
+    clickCuoriCounter++;
+
     // Evita di spammare troppi cuori contemporaneamente
     if (document.querySelectorAll("span.cuore-puff").length > 8) return;
 
