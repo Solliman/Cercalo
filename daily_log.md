@@ -6,7 +6,7 @@
     *   **Riprogettazione Header**: Sostituito il vecchio tasto generico con due CTAs dedicati: "Lavora con noi" (pulsante terracotta) e "Accedi" (link/tasto secondario).
     *   **Riprogettazione Footer**: Aggiunto il link diretto "Registrati come Lavoratore" accanto all'Area Riservata Admin.
     *   **Riprogettazione Modale Auth**: Rimosso il tab-selector e il dropdown di scelta del ruolo. Diviso il modale in 5 sotto-sezioni HTML distinte: Login, Registrazione Cercatore, Candidatura Lavoratore Step 1, Candidatura Lavoratore Step 2, e Box Successo.
-    *   Aggiornato il link di importazione a `index.css?v=9.0` e `index.js?v=9.0` per il cache-busting.
+    *   Aggiornato il link di importazione a `index.css?v=10.0` e `index.js?v=10.0` per il cache-busting.
 *   **[MODIFY] [index.js](file:///Users/sollimac/Desktop/Solli%20Works/07%20-%20Cercalo/index.js)**:
     *   Aggiunto `preferiti` e `soloPreferiti` nello stato globale e caricamento/salvataggio in `localStorage` con la chiave `cercalo_preferiti`.
     *   Implementata la funzione `togglePreferito(id, event)` per salvare/rimuovere gli elementi.
@@ -15,8 +15,9 @@
     *   Sviluppati i gestori di invio distinti per ciascun form: `inviaFormLogin()`, `inviaFormRegistrazioneCercatore()`, `inviaFormLavoratoreStep1()` e `inviaFormLavoratoreStep2()`.
     *   Aggiornata `aggiornaUIRegistrazione` per nascondere il pulsante "Lavora con noi" una volta effettuato l'accesso.
     *   Rimosso il vecchio listener generico `#form-auth` in `DOMContentLoaded`.
+    *   **Limitazione Cuori**: Limitato l'effetto dei cuoricini float a un massimo di 5 click per sessione, dopodiché il click-listener viene rimosso automaticamente per non disturbare la navigazione normale.
 *   **[MODIFY] [admin.html](file:///Users/sollimac/Desktop/Solli%20Works/07%20-%20Cercalo/admin.html)**, **[chi-siamo.html](file:///Users/sollimac/Desktop/Solli%20Works/07%20-%20Cercalo/chi-siamo.html)**, **[legal.html](file:///Users/sollimac/Desktop/Solli%20Works/07%20-%20Cercalo/legal.html)**:
-    *   Aggiornati i riferimenti al CSS a `index.css?v=9.0` per allineare la cache globale.
+    *   Aggiornati i riferimenti al CSS a `index.css?v=10.0` per allineare la cache globale.
 
 ## 🐛 Bug Aperti
 *   Nessun bug rilevato. Tutte le modifiche sono state testate con successo ed integrate localmente e su GitHub.
