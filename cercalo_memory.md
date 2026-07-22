@@ -58,3 +58,9 @@ Il database è salvato sul client dell'utente all'interno della memoria **`local
 ## 📱 4. Configurazione Mobile App (PWA)
 *   **`manifest.json`**: Configura l'installabilità su smartphone con icona in terracotta ed avvio in modalità app nativa (*standalone*).
 *   **`sw.js`**: Service Worker che garantisce il caricamento delle risorse offline e gestisce la cache di base dell'applicazione per la stabilità in caso di blackout di rete.
+
+---
+
+## 📌 5. Appunti per i Prossimi Sviluppi & Sessioni (Promemoria)
+*   **Blindatura Feedback e Recensioni**: Discutere e migliorare ulteriormente il sistema di convalida dei feedback e dei lavori effettuati per azzerare qualsiasi rischio di recensione falsa o manipolata (specialmente per i tuttofare a domicilio).
+*   **Caccia ai Bug & Security Audit**: Effettuare un controllo incrociato alla ricerca di comportamenti anomali o bug per blindare l'applicazione prima del lancio ufficiale.
