@@ -667,12 +667,6 @@ window.inviaFormLavoratoreStep1 = (e) => {
     tipo: document.getElementById("lavoratore-tipo").value
   };
   
-  // Pre-imposta qualifica nello Step 2
-  const qualificaInput = document.getElementById("lavoratore-qualifica");
-  if (qualificaInput) {
-    qualificaInput.value = state.tempLavoratore.tipo === "professionista" ? "Professionista" : "Tuttofare";
-  }
-  
   mostraSottoSezioneAuth('candidati-lavoratore-step2');
 };
 
@@ -681,9 +675,26 @@ window.inviaFormLavoratoreStep2 = (e) => {
   e.preventDefault();
   if (!state.tempLavoratore) return;
   
-  const avatarVal = document.getElementById("lavoratore-avatar").value;
-  const qualificaVal = document.getElementById("lavoratore-qualifica").value.trim() || (state.tempLavoratore.tipo === "professionista" ? "Professionista" : "Aiutante");
-  const categoriaVal = document.getElementById("lavoratore-categoria").value;
+  const attivitaVal = document.getElementById("lavoratore-attivita").value;
+  
+  // Mappatura automatica di Categoria, Avatar e Qualifica di default per omogeneità
+  const mappaAttivita = {
+    tuttofare: { categoria: "tuttofare", avatar: "👨‍🔧", ruolo: "Tuttofare" },
+    idraulico: { categoria: "idraulico", avatar: "🔧", ruolo: "Idraulico" },
+    elettricista: { categoria: "elettricista", avatar: "⚡", ruolo: "Elettricista" },
+    estetista: { categoria: "estetista", avatar: "💇‍♀️", ruolo: "Estetista / Cura Persona" },
+    assistenza: { categoria: "assistenza", avatar: "👩‍⚕️", ruolo: "Assistenza / Cura Persona" },
+    artigianato: { categoria: "artigianato", avatar: "🪵", ruolo: "Falegname / Artigiano" },
+    artista: { categoria: "artista", avatar: "🎨", ruolo: "Artista / Decoratore" },
+    altro: { categoria: "altro", avatar: "🌸", ruolo: "Collaboratore" }
+  };
+  
+  const dettagli = mappaAttivita[attivitaVal] || mappaAttivita.altro;
+  
+  const avatarVal = dettagli.avatar;
+  const qualificaVal = dettagli.ruolo;
+  const categoriaVal = dettagli.categoria;
+  
   const cittaVal = document.getElementById("lavoratore-citta").value.trim() || "Messina";
   const telefonoVal = document.getElementById("lavoratore-telefono").value.trim() || "Non fornito";
   const prezzoVal = document.getElementById("lavoratore-prezzo").value.trim() || "Da concordare";

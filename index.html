@@ -7,7 +7,7 @@
   <title>Cercalo - Troviamo chi ti aiuta con il cuore</title>
   <link rel="icon" type="image/png" href="Loghi/logo_terracotta_scontornato.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="index.css?v=10.0">
+  <link rel="stylesheet" href="index.css?v=11.0">
 </head>
 <body>
 
@@ -254,39 +254,16 @@
       <div id="auth-sezione-candidati-lavoratore-step2" style="display: none; flex-direction: column; gap: 16px; width: 100%;">
         <form id="form-lavoratore-step2" class="modal-form" onsubmit="inviaFormLavoratoreStep2(event)">
           <div class="form-group">
-            <label class="form-label" for="lavoratore-avatar">Seleziona il tuo Simbolo / Emoji</label>
-            <select id="lavoratore-avatar" class="form-input">
-              <option value="👨‍🔧">👨‍🔧 Tuttofare</option>
-              <option value="🔧">🔧 Idraulico</option>
-              <option value="⚡">⚡ Elettricista</option>
-              <option value="💇‍♀️">💇‍♀️ Estetista / Parrucchiera</option>
-              <option value="👩‍⚕️">👩‍⚕️ Assistenza / Compagnia</option>
-              <option value="🪵">🪵 Falegname / Artigiano</option>
-              <option value="🎨">🎨 Artista / Decoratore</option>
-              <option value="🧹">🧹 Pulizie</option>
-              <option value="🧑‍🍳">🧑‍🍳 Cuoco / Ristorazione</option>
-              <option value="🧑‍🌾">🧑‍🌾 Giardiniere / Agricoltura</option>
-              <option value="📐">📐 Progettista / Geometra</option>
-              <option value="🚗">🚗 Trasporti / Autista</option>
-              <option value="💻">💻 Assistenza PC / Tech</option>
-              <option value="🌸">🌸 Altro</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="lavoratore-qualifica">Qualifica / Ruolo Specifico</label>
-            <input type="text" id="lavoratore-qualifica" class="form-input" placeholder="Es. Idraulico Rapido, Falegname Creativo, Tuttofare Gentile" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="lavoratore-categoria">Categoria Principale</label>
-            <select id="lavoratore-categoria" class="form-input">
-              <option value="tuttofare">Tuttofare</option>
-              <option value="idraulico">Idraulico</option>
-              <option value="elettricista">Elettricista</option>
-              <option value="estetista">Estetista</option>
-              <option value="assistenza">Assistenza / Cura Persona</option>
-              <option value="artigianato">Artigianato / Falegname</option>
-              <option value="artista">Artista / Decoratore</option>
-              <option value="altro">Altro</option>
+            <label class="form-label" for="lavoratore-attivita">Seleziona la tua Attività / Professione</label>
+            <select id="lavoratore-attivita" class="form-input">
+              <option value="tuttofare">👨‍🔧 Tuttofare</option>
+              <option value="idraulico">🔧 Idraulico / Termoidraulico</option>
+              <option value="elettricista">⚡ Elettricista / Riparatore</option>
+              <option value="estetista">💇‍♀️ Estetista / Cura Persona</option>
+              <option value="assistenza">👩‍⚕️ Assistenza / Compagnia</option>
+              <option value="artigianato">🪵 Falegname / Artigiano del legno</option>
+              <option value="artista">🎨 Artista / Decoratore</option>
+              <option value="altro">🌸 Altro / Collaboratore</option>
             </select>
           </div>
           <div class="form-group">
@@ -403,6 +380,6 @@
     </div>
   </div>
 
-  <script src="index.js?v=10.0"></script>
+  <script src="index.js?v=11.0"></script>
 </body>
 </html>
